@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://n203b1ovbyaa"]
+
+[ext_resource type="Script" uid="uid://c14v28157f25u" path="res://Example Game/Scripts/main.gd" id="1_7md66"]
+[ext_resource type="ColorPalette" uid="uid://00n7h0rkyden" path="res://Example Game/Assets/background_color.tres" id="2_4ccrp"]
+[ext_resource type="PackedScene" uid="uid://g7e3tetos2o2" path="res://Example Game/Scenes/goal.tscn" id="3_ni0vc"]
+[ext_resource type="PackedScene" uid="uid://m641i44ck6nt" path="res://Example Game/Scenes/ball.tscn" id="5_rh4gn"]
+[ext_resource type="PackedScene" uid="uid://c5xtgbhedq1mn" path="res://Example Game/Scenes/player.tscn" id="6_s0qje"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_icmf6"]
+normal = Vector2(0, 1)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_tf2dg"]
+
+[node name="Main" type="Node2D" unique_id=1016540715]
+script = ExtResource("1_7md66")
+background_color = ExtResource("2_4ccrp")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1428276429]
+unique_name_in_owner = true
+offset_right = 700.0
+offset_bottom = 400.0
+color = Color(0.1, 0.1, 0.1, 1)
+
+[node name="Score" type="Label" parent="." unique_id=1039895112]
+unique_name_in_owner = true
+offset_right = 40.0
+offset_bottom = 23.0
+text = "0 - 0"
+
+[node name="Camera" type="Camera2D" parent="." unique_id=1627247761]
+unique_name_in_owner = true
+anchor_mode = 0
+
+[node name="Top Border" type="StaticBody2D" parent="." unique_id=149899551]
+unique_name_in_owner = true
+
+[node name="Shape" type="CollisionShape2D" parent="Top Border" unique_id=1839086673]
+shape = SubResource("WorldBoundaryShape2D_icmf6")
+
+[node name="Bottom Border" type="StaticBody2D" parent="." unique_id=77437113]
+unique_name_in_owner = true
+position = Vector2(700, 400)
+
+[node name="Shape" type="CollisionShape2D" parent="Bottom Border" unique_id=1262143661]
+shape = SubResource("WorldBoundaryShape2D_tf2dg")
+
+[node name="Left Goal" parent="." unique_id=1307217693 instance=ExtResource("3_ni0vc")]
+position = Vector2(0, 200)
+
+[node name="Right Goal" parent="." unique_id=1634074264 instance=ExtResource("3_ni0vc")]
+position = Vector2(700, 200)
+rotation = 3.1415927
+
+[node name="Ball" parent="." unique_id=829984143 instance=ExtResource("5_rh4gn")]
+unique_name_in_owner = true
+position = Vector2(350, 200)
+
+[node name="Player 1" parent="." unique_id=91188681 instance=ExtResource("6_s0qje")]
+unique_name_in_owner = true
+position = Vector2(20, 200)
+controller = 1
+
+[node name="Player 2" parent="." unique_id=285904424 node_paths=PackedStringArray("bot_target") instance=ExtResource("6_s0qje")]
+unique_name_in_owner = true
+position = Vector2(680, 200)
+bot_target = NodePath("../Ball")
+
+[connection signal="area_entered" from="Left Goal" to="." method="_on_left_goal_area_entered"]
+[connection signal="area_entered" from="Right Goal" to="." method="_on_right_goal_area_entered"]
+[connection signal="body_entered" from="Ball" to="." method="_on_ball_body_entered"]

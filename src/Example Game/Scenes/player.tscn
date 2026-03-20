@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://c5xtgbhedq1mn"]
+
+[ext_resource type="Script" uid="uid://b4apos4rm216p" path="res://Example Game/Scripts/player.gd" id="1_hoxas"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_hoxas"]
+bounce = 0.7
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jkwwx"]
+size = Vector2(15, 70)
+
+[node name="Player" type="RigidBody2D" unique_id=91188681]
+mass = 1000.0
+physics_material_override = SubResource("PhysicsMaterial_hoxas")
+can_sleep = false
+lock_rotation = true
+contact_monitor = true
+max_contacts_reported = 2
+linear_damp_mode = 1
+linear_damp = 5.0
+angular_damp_mode = 1
+script = ExtResource("1_hoxas")
+
+[node name="Shape" type="CollisionShape2D" parent="." unique_id=308778442]
+shape = SubResource("RectangleShape2D_jkwwx")
+
+[node name="Color" type="ColorRect" parent="." unique_id=334074444]
+offset_left = -7.5
+offset_top = -35.0
+offset_right = 7.5
+offset_bottom = 35.0
