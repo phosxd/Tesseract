@@ -1,6 +1,9 @@
 ## Tesseract mod instance.
 @abstract class_name TesseractMod extends Object
 
+## Full config file for this mod.
+var config: ConfigFile
+
 ## Unique mod identifier.
 var name: String
 ## Mod author. Optional.

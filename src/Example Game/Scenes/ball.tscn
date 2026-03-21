@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dib4k17e4u5me" path="res://Example Game/Scripts/ball.gd" id="1_krxox"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ju1f6"]
-radius = 15.0
+radius = 11.0
 
 [node name="Ball" type="Area2D" unique_id=721152477]
 script = ExtResource("1_krxox")

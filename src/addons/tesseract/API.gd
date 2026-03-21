@@ -50,6 +50,13 @@ var allow_mods_without_details: bool:
 	get():
 		return config.get_value('game', 'allow_mods_without_details', false)
 
+var allow_mod_scripts: bool:
+	set(value):
+		allow_mod_scripts = value
+		config.set_value('game', 'allow_mod_scripts', value)
+	get():
+		return config.get_value('game', 'allow_mod_scripts', true)
+
 #endregion
 
 ## Every loaded mod instance.
@@ -91,15 +98,6 @@ func load_mods() -> void:
 		# Load mods in alphabetical order.
 		mod_paths.sort()
 		for mod_path:String in mod_paths:
-			# Get mod script.
-			var mod_script_path:String = mod_path+'/INIT.gd'
-			var mod_script = load(mod_script_path) as GDScript
-			# If none found or is invalid, use backup script.
-			if mod_script is not GDScript or mod_script.get_base_script() != TesseractMod:
-				mod_script = load('res://addons/tesseract/TesseractModScript.gd')
-
-			var mod_instance = mod_script.new() as TesseractMod
-
 			# Get mod config.
 			var mod_config_path:String = mod_path+'/MOD.cfg'
 			var mod_config := ConfigFile.new()
@@ -108,7 +106,25 @@ func load_mods() -> void:
 				TesseractErrorServer.warning.emit(1, [mod_path])
 				if not allow_mods_without_details: continue
 
-			var load_into_path:String = mod_config.get_value('TesseractMod', 'load_into_path', load_mods_into_path)
+			# Get game configuration for mods of this type.
+			var mod_type:String = mod_config.get_value('TesseractMod', 'type', '')
+			var mod_type_section:String = 'MOD TYPE: %s' % mod_type
+
+			var load_into_path:String = config.get_value(mod_type_section, 'load_mods_into_path', load_mods_into_path)
+			var allow_mod_scripts:bool = config.get_value(mod_type_section, 'allow_mod_scripts', allow_mod_scripts)
+
+			# Get mod script.
+			var mod_script_path:String = mod_path+'/INIT.gd'
+			var mod_script
+			if allow_mod_scripts && FileAccess.file_exists(mod_script_path):
+				mod_script = load(mod_script_path) as GDScript
+			# If none found or is invalid, use backup script.
+			if mod_script is not GDScript or mod_script.get_base_script() != TesseractMod:
+				mod_script = load('res://addons/tesseract/TesseractModScript.gd')
+			var mod_instance = mod_script.new() as TesseractMod
+
+			# Set config values to the mod instance.
+			mod_instance.config = mod_config
 			for key:String in mod_config.get_section_keys('TesseractMod'):
 				mod_instance.set(key, mod_config.get_value('TesseractMod', key))
 
@@ -122,6 +138,7 @@ func load_mods() -> void:
 				# Load resource.
 				if ext in ['tres','res','tscn','scn','gd','gdshader','theme','material']:
 					var res = load(file_path)
+					if res is Script && not allow_mod_scripts: return
 					if res:
 						res.take_over_path(resource_path)
 						mod_instance.resources.append(res)
@@ -135,7 +152,6 @@ func load_mods() -> void:
 			# Initialize mod.
 			mod_instance.init()
 			mod_instances.set(mod_instance.name, mod_instance)
-			print(mod_instance.resources)
 
 
 func _ready() -> void:

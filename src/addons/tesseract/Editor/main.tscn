@@ -11,4 +11,5 @@ size_flags_vertical = 3
 
 [node name="Label" type="Label" parent="." unique_id=669286649]
 layout_mode = 2
-text = "hello"
+text = "Tesseract is a W.I.P. modding platform for Godot, currently this tab does nothing, mods must be created manually & game config must be edited from the \"plugin.cfg\" file."
+autowrap_mode = 3
