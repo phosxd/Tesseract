@@ -1,6 +1,4 @@
 ## Tesseract mod instance.
-##
-## Details (such as name & version) should be overriden within the [code]_init[/code]) method.
 @abstract class_name TesseractMod extends Object
 
 ## Unique mod identifier.

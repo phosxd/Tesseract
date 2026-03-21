@@ -8,6 +8,7 @@ var velocity := Vector2.ZERO
 
 func _process(delta:float) -> void:
 	position += velocity*delta
+	position += Vector2(0, randf_range(-0.5, 0.5)) # Add deviation.
 
 
 func _draw() -> void:

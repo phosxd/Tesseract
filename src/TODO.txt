@@ -1,0 +1,2 @@
+- Add ability to select a directory from the Tesseract screen & allow editing config / exporting the mod in that directory.
+- Add ability to edit game config from the Tesseract screen.

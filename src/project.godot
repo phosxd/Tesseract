@@ -16,8 +16,9 @@ config/features=PackedStringArray("4.6", "GL Compatibility")
 
 [autoload]
 
-Init="*uid://djkjh4noqamro"
 TesseractAPI="*uid://dn4wiq2geesy6"
+TesseractErrorServer="*uid://dfsijm3jpbmlm"
+Init="*uid://djkjh4noqamro"
 
 [display]
 

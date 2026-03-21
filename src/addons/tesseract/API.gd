@@ -7,25 +7,59 @@
 ## Set [param signal_map] to provide signals that mods can call.
 extends Node
 
-## Whether or not PCKs are allowed to overwrite resources.
-var allow_pck_overwriting_files:bool = true
 ## Assets available to mods.
 var asset_map:Dictionary[String,Variant] = {}
 ## Signals available to mods.
 var signal_map:Dictionary[String,Signal] = {}
 
-## Path to load PCK mods from.
-var patches_path:String = 'user://PATCHES'
-## Path to load mods from.
-var mods_path:String = 'user://MOD'
-## Path in which mod files get loaded into.
-var load_mods_into_path:String = 'res://'
+#region config
 
-## The game's API version. Only increment this when you have made breaking changes in file structure or API.
-var game_api_version:int = 1
+var config := ConfigFile.new()
+
+## Path to load PCKs from. If is an empty string, PCK loading is disabled.
+var patches_path: String:
+	set(value):
+		patches_path = value
+		config.set_value('game', 'patches_path', value)
+	get():
+		return config.get_value('game', 'patches_path', '')
+
+## Path to load mods from. If is an empty string, Tesseract mod loading is disabled.
+var mods_path: String:
+	set(value):
+		patches_path = value
+		config.set_value('game', 'mods_path', value)
+	get():
+		return config.get_value('game', 'mods_path', '')
+
+## Path to load all mods into.
+## If path ends with "*" will put the mod into a sub-directory with the name of the mod (or file name if details are unavailable)
+var load_mods_into_path: String:
+	set(value):
+		load_mods_into_path = value
+		config.set_value('game', 'load_mods_into_path', value)
+	get():
+		return config.get_value('game', 'load_mods_into_path', '')
+
+## If true, Tesseract will load in mods that don't have any configuration, name, or other details.
+## These mods will not be accesible to the game in any way.
+var allow_mods_without_details: bool:
+	set(value):
+		allow_mods_without_details = value
+		config.set_value('game', 'allow_mods_without_details', value)
+	get():
+		return config.get_value('game', 'allow_mods_without_details', false)
+
+#endregion
 
 ## Every loaded mod instance.
 var mod_instances:Dictionary[String,TesseractMod] = {}
+
+
+func _init() -> void:
+	var err:Error = config.load('res://addons/tesseract/plugin.cfg')
+	if err != OK:
+		TesseractErrorServer.error.emit(1)
 
 
 ## Set API variables via Dictionary.
@@ -36,48 +70,72 @@ func init(options:Dictionary[String,Variant]) -> void:
 
 func load_mods() -> void:
 	# Get PCK patch paths.
-	var pck_paths := PackedStringArray()
-	TesseractUtils.walk_dir(patches_path, func(file_path:String) -> void:
-		pck_paths.append(file_path)
-	)
-	# Load PCK mods in alphabetical order.
-	pck_paths.sort()
-	for path:String in pck_paths:
-		var succeeded:bool = ProjectSettings.load_resource_pack(path, allow_pck_overwriting_files)
-		if not succeeded:
-			continue
+	if not patches_path.is_empty():
+		var pck_paths := PackedStringArray()
+		TesseractUtils.walk_dir(patches_path, func(file_path:String) -> void:
+			pck_paths.append(file_path)
+		)
+		# Load PCK mods in alphabetical order.
+		pck_paths.sort()
+		for path:String in pck_paths:
+			var succeeded:bool = ProjectSettings.load_resource_pack(path, true)
+			if not succeeded:
+				continue
 
 	# Get mod paths.
-	var mod_paths := PackedStringArray()
-	for dir_path:String in DirAccess.get_directories_at(mods_path):
-		mod_paths.append(mods_path+'/'+dir_path)
+	if not mods_path.is_empty():
+		var mod_paths := PackedStringArray()
+		for dir_path:String in DirAccess.get_directories_at(mods_path):
+			mod_paths.append(mods_path+'/'+dir_path)
 
-	# Load mods in alphabetical order.
-	mod_paths.sort()
-	for mod_path:String in mod_paths:
-		# Get mod script.
-		var mod_script_path:String = mod_path+'/'+'MOD.gd'
-		var mod_script = load(mod_script_path) as GDScript
-		if mod_script is not GDScript: continue
-		var mod_is_valid:bool = mod_script.get_base_script() == TesseractMod
-		if not mod_is_valid: continue
-		# Walk through all resources in the mod & load them.
-		var resources:Array[Resource] = []
-		TesseractUtils.walk_dir(mod_path, func(file_path:String) -> void:
-			var relative_path:String = file_path.trim_prefix(mod_path+'/')
-			if relative_path == 'MOD.gd': return
-			var ext:String = file_path.split('.')[-1]
-			if ext in ['tres','res','tscn','scn','gd','gdshader','theme','material']:
-				var res = load(file_path)
-				if res:
-					res.take_over_path(load_mods_into_path+('' if load_mods_into_path.ends_with('/') else '/')+'%s' % relative_path)
-					resources.append(res)
-		)
-		# Initialize mod.
-		var mod_instance = mod_script.new() as TesseractMod
-		mod_instance.resources = resources
-		mod_instance.init()
-		mod_instances.set(mod_instance.name, mod_instance)
+		# Load mods in alphabetical order.
+		mod_paths.sort()
+		for mod_path:String in mod_paths:
+			# Get mod script.
+			var mod_script_path:String = mod_path+'/INIT.gd'
+			var mod_script = load(mod_script_path) as GDScript
+			# If none found or is invalid, use backup script.
+			if mod_script is not GDScript or mod_script.get_base_script() != TesseractMod:
+				mod_script = load('res://addons/tesseract/TesseractModScript.gd')
+
+			var mod_instance = mod_script.new() as TesseractMod
+
+			# Get mod config.
+			var mod_config_path:String = mod_path+'/MOD.cfg'
+			var mod_config := ConfigFile.new()
+			var err:Error = mod_config.load(mod_config_path)
+			if err != OK:
+				TesseractErrorServer.warning.emit(1, [mod_path])
+				if not allow_mods_without_details: continue
+
+			var load_into_path:String = mod_config.get_value('TesseractMod', 'load_into_path', load_mods_into_path)
+			for key:String in mod_config.get_section_keys('TesseractMod'):
+				mod_instance.set(key, mod_config.get_value('TesseractMod', key))
+
+			# Walk through all resources in the mod & load them.
+			var resources:Array[Resource] = []
+			TesseractUtils.walk_dir(mod_path, func(file_path:String) -> void:
+				var relative_path:String = file_path.trim_prefix(mod_path+'/')
+				if relative_path in ['INIT.gd','MOD.cfg']: return
+				var resource_path:String = 'res://'+load_into_path+('' if load_into_path.ends_with('/') else '/')+'%s' % relative_path
+				var ext:String = file_path.split('.')[-1]
+				# Load resource.
+				if ext in ['tres','res','tscn','scn','gd','gdshader','theme','material']:
+					var res = load(file_path)
+					if res:
+						res.take_over_path(resource_path)
+						mod_instance.resources.append(res)
+				# Load image.
+				elif ext in ['svg','png','jpg','jpeg']:
+					var res = Image.load_from_file(file_path)
+					if res:
+						res.take_over_path(resource_path)
+						mod_instance.resources.append(res)
+			)
+			# Initialize mod.
+			mod_instance.init()
+			mod_instances.set(mod_instance.name, mod_instance)
+			print(mod_instance.resources)
 
 
 func _ready() -> void:

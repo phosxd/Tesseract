@@ -24,6 +24,7 @@ func _process(delta:float) -> void:
 	if Engine.get_process_frames() % 10 == 0:
 		queue_redraw()
 	position += velocity*delta
+	position += Vector2(0, randf_range(-0.5, 0.5)) # Add deviation.
 
 
 func _draw() -> void:

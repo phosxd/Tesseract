@@ -55,10 +55,10 @@ rotation = 3.1415927
 unique_name_in_owner = true
 position = Vector2(350, 200)
 
-[node name="Player 1" parent="." unique_id=91188681 instance=ExtResource("6_s0qje")]
+[node name="Player 1" parent="." unique_id=91188681 node_paths=PackedStringArray("bot_target") instance=ExtResource("6_s0qje")]
 unique_name_in_owner = true
 position = Vector2(20, 200)
-controller = 1
+bot_target = NodePath("../Ball")
 
 [node name="Player 2" parent="." unique_id=285904424 node_paths=PackedStringArray("bot_target") instance=ExtResource("6_s0qje")]
 unique_name_in_owner = true
