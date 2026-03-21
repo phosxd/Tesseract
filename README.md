@@ -38,7 +38,7 @@ For the end user, installing mods should be as simple & seamless as possible. Th
    It works like this because mods are loaded alphabetically based on their file/folder name.
 
 
-# Create your first mod
+# Create a basic mod
 If you are familiar with Godot 4.0 then creating a Tesseract mod will be a breeze.
 To get started open a brand new project in Godot 4 with Tesseract installed. Developers may provide a dedicated Godot project for modders, use that if possible.
 
@@ -84,3 +84,27 @@ func recieve_signal(_signal_name:String, ..._args) -> void:
 	pass
 ```
 
+Your script file should be located in the *root directory of your mod* & have the exact name `INIT.gd`.
+
+## Adding content
+Files in your mod are directly imported into the virtual file system of the game, this means things can be overwritten & can break if you aren't careful (given that the game is very permissive of mods).
+Always follow the game's documentation for locations to put your mod files.
+
+There is not anything else to say here, the rest is up to the game itself to document.
+
+---
+
+# A guide on creating moddable games
+Slapping on a mod manager to your game doesn't automatically make it easily moddable. Here are some general rules you should follow to ensure a straight forward experience for modders.
+
+## Define a clear file structure
+Your game files should be clearly laid out & folder names should be self explanatory. Avoid obscure or confusing naming schemes.
+For example all your games scenes should usually be in a single "Scenes" folder, same goes for scripts, textures, models, & other elements.
+
+## Keep things modular
+Always try to keep everything as separated & reusable as humanly possible! A scene with all it's scripts, resources, & settings built into itself is not a very moddable one.
+
+Not only will separating things help with reusability, organization, & modification, but it also allows modders to change a single thing without breaking after another mod gets added or after you update your game.
+
+## Provide documentation for modders
+Modders don't just know your project's file structure & APIs off the top of their head, you need to provide them with that knowledge, **especially if your game is closed source**.
