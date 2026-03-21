@@ -7,7 +7,7 @@
 ## Set [param signal_map] to provide signals that mods can call.
 extends Node
 
-## Assets available to mods.
+## Assets available to mods. This is only used in [AssetLinker].
 var asset_map:Dictionary[String,Variant] = {}
 ## Signals available to mods.
 var signal_map:Dictionary[String,Signal] = {}
@@ -101,8 +101,8 @@ func load_mods() -> void:
 			# Get mod config.
 			var mod_config_path:String = mod_path+'/MOD.cfg'
 			var mod_config := ConfigFile.new()
-			var err:Error = mod_config.load(mod_config_path)
-			if err != OK:
+			var mod_config_err:Error = mod_config.load(mod_config_path)
+			if mod_config_err != OK:
 				TesseractErrorServer.warning.emit(1, [mod_path])
 				if not allow_mods_without_details: continue
 
@@ -120,7 +120,7 @@ func load_mods() -> void:
 				mod_script = load(mod_script_path) as GDScript
 			# If none found or is invalid, use backup script.
 			if mod_script is not GDScript or mod_script.get_base_script() != TesseractMod:
-				mod_script = load('res://addons/tesseract/TesseractModScript.gd')
+				mod_script = load('res://addons/tesseract/ModScript.gd')
 			var mod_instance = mod_script.new() as TesseractMod
 
 			# Set config values to the mod instance.
@@ -148,11 +148,28 @@ func load_mods() -> void:
 					if res:
 						res.take_over_path(resource_path)
 						mod_instance.resources.append(res)
+				# Load config.
+				elif ext in ['cfg']:
+					var res = ConfigFile.new()
+					var res_err:Error = res.load(file_path)
+					if res_err == OK:
+						if res.has_section('SceneVariables'):
+							var scene_path:String = resource_path.trim_suffix('.cfg')
+							mod_instance.scene_variables.set(scene_path, {})
+							for key:String in res.get_section_keys('SceneVariables'):
+								mod_instance.scene_variables[scene_path].set(key, res.get_value('SceneVariables',key))
+							var scene = load(scene_path)
+							if scene is PackedScene:
+								var variable_setter := SceneVariableSetter.new()
+								variable_setter.name = 'SceneVariableSetter'
+								variable_setter.mod_instance_name = mod_instance.name
+								var scene_instance = scene.instantiate()
+								scene_instance.add_child(variable_setter)
+								variable_setter.owner = scene_instance
+								scene.pack(scene_instance)
+								scene.take_over_path(scene_path)
+								mod_instance.resources.append(scene)
 			)
 			# Initialize mod.
 			mod_instance.init()
 			mod_instances.set(mod_instance.name, mod_instance)
-
-
-func _ready() -> void:
-	pass

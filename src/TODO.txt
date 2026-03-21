@@ -1,2 +1,3 @@
 - Add ability to select a directory from the Tesseract screen & allow editing config / exporting the mod in that directory.
 - Add ability to edit game config from the Tesseract screen.
+- Add ability to toggle enabled mods at run time & reset virtual file system without restarting.

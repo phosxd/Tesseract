@@ -92,8 +92,6 @@ Always follow the game's documentation for locations to put your mod files.
 
 There is not anything else to say here, the rest is up to the game itself to document.
 
----
-
 # A guide on creating moddable games
 Slapping on a mod manager to your game doesn't automatically make it easily moddable. Here are some general rules you should follow to ensure a straight forward experience for modders.
 

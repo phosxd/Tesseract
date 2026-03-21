@@ -1,8 +1,7 @@
 extends Area2D
 
-const color := Color.WHITE
-const trail_color := Color.WHITE
-
+var color := Color.WHITE
+var trail_color := Color.WHITE
 var velocity := Vector2.ZERO
 
 

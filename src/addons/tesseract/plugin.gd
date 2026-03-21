@@ -1,17 +1,33 @@
 @tool
 extends EditorPlugin
 
-const singleton_name:String = 'TesseractAPI'
-const singleton_path:String = 'res://addons/tesseract/API.gd'
+const singleton_names:Array[String] = ['TesseractAPI', 'TesseractErrorServer']
+const singleton_paths:Array[String] = ['res://addons/tesseract/API.gd', 'res://addons/tesseract/ErrorServer.gd']
 var tab_instance: Control
 
 
 func _enable_plugin() -> void:
-	add_autoload_singleton(singleton_name, singleton_path)
+	# Remove all autoloads.
+	var autoloads:Dictionary[String,String] = {}
+	for property:Dictionary in ProjectSettings.get_property_list():
+		if property.name.begins_with('autoload/'):
+			var autoload_name:String = property.name.split('/')[-1]
+			var autoload_value = ProjectSettings.get_setting('autoload/%s' % autoload_name)
+			autoloads.set(autoload_name, load(autoload_value.trim_prefix('*')).resource_path)
+			remove_autoload_singleton(autoload_name)
+
+	# Add plugin autoloads.
+	for i:int in singleton_names.size():
+		add_autoload_singleton(singleton_names[i], singleton_paths[i])
+
+	# Re-add original autoloads after plugin autoloads.
+	for key:String in autoloads:
+		add_autoload_singleton(key, autoloads[key])
 
 
 func _disable_plugin() -> void:
-	remove_autoload_singleton(singleton_name)
+	for i:int in singleton_names.size():
+		remove_autoload_singleton(singleton_names[i])
 
 
 func _enter_tree() -> void:

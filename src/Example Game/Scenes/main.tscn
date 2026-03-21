@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://n203b1ovbyaa"]
 
 [ext_resource type="Script" uid="uid://c14v28157f25u" path="res://Example Game/Scripts/main.gd" id="1_7md66"]
-[ext_resource type="ColorPalette" uid="uid://00n7h0rkyden" path="res://Example Game/Assets/background_color.tres" id="2_4ccrp"]
 [ext_resource type="PackedScene" uid="uid://g7e3tetos2o2" path="res://Example Game/Scenes/goal.tscn" id="3_ni0vc"]
 [ext_resource type="PackedScene" uid="uid://m641i44ck6nt" path="res://Example Game/Scenes/ball.tscn" id="5_rh4gn"]
 [ext_resource type="PackedScene" uid="uid://c5xtgbhedq1mn" path="res://Example Game/Scenes/player.tscn" id="6_s0qje"]
@@ -13,7 +12,10 @@ normal = Vector2(0, 1)
 
 [node name="Main" type="Node2D" unique_id=1016540715]
 script = ExtResource("1_7md66")
-background_color = ExtResource("2_4ccrp")
+background_color = Color(0.101960786, 0.101960786, 0.101960786, 1)
+player_1_color = Color(1, 1, 1, 1)
+player_2_color = Color(1, 1, 1, 1)
+ball_color = Color(1, 1, 1, 1)
 
 [node name="Background" type="ColorRect" parent="." unique_id=1428276429]
 unique_name_in_owner = true

@@ -33,7 +33,6 @@ enabled=PackedStringArray("res://addons/tesseract/plugin.cfg")
 [file_customization]
 
 folder_colors={
-"res://Example Game/Assets/": "yellow",
 "res://Example Game/Scenes/": "blue",
 "res://Example Game/Scripts/": "red"
 }
