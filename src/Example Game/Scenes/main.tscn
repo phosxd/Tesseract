@@ -25,7 +25,7 @@ color = Color(0.1, 0.1, 0.1, 1)
 
 [node name="Score" type="Label" parent="." unique_id=1039895112]
 unique_name_in_owner = true
-offset_right = 40.0
+offset_right = 32.0
 offset_bottom = 23.0
 text = "0 - 0"
 

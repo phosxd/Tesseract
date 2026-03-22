@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://c75l60rldx6wy"]
+
+[ext_resource type="Script" uid="uid://54hah8qtvily" path="res://addons/tesseract/Nodes/SceneMerger.gd" id="1_6oqqb"]
+[ext_resource type="Script" uid="uid://b46movjli0m6g" path="res://addons/tesseract/Nodes/AssetLinker.gd" id="2_pn4g5"]
+
+[node name="Main" type="Node" unique_id=1385759991 node_paths=PackedStringArray("included_nodes")]
+script = ExtResource("1_6oqqb")
+included_nodes = [NodePath("Background"), NodePath("BG Material Asset Linker")]
+metadata/_custom_type_script = "uid://54hah8qtvily"
+
+[node name="BG Material Asset Linker" type="Node" parent="." unique_id=92497016 node_paths=PackedStringArray("node")]
+script = ExtResource("2_pn4g5")
+asset_path = "Example Game/Assets/underwater.material"
+node = NodePath("../Background")
+node_property = "material"
+metadata/_custom_type_script = "uid://b46movjli0m6g"
+
+[node name="Background" type="ColorRect" parent="." unique_id=431782879]
+offset_right = 700.0
+offset_bottom = 400.0

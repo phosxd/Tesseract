@@ -59,6 +59,7 @@ var allow_mod_scripts: bool:
 
 #endregion
 
+var config_loaded:bool = false
 ## Every loaded mod instance.
 var mod_instances:Dictionary[String,TesseractMod] = {}
 
@@ -66,6 +67,13 @@ var mod_instances:Dictionary[String,TesseractMod] = {}
 func _init() -> void:
 	var err:Error = config.load('res://addons/tesseract/plugin.cfg')
 	if err != OK:
+		return
+	config_loaded = true
+
+
+func _ready() -> void:
+	if not config_loaded:
+		print("YTUHUIh")
 		TesseractErrorServer.error.emit(1)
 
 
@@ -79,6 +87,7 @@ func load_mods() -> void:
 	# Get PCK patch paths.
 	if not patches_path.is_empty():
 		var pck_paths := PackedStringArray()
+		if not DirAccess.dir_exists_absolute(mods_path): DirAccess.make_dir_recursive_absolute(patches_path)
 		TesseractUtils.walk_dir(patches_path, func(file_path:String) -> void:
 			pck_paths.append(file_path)
 		)
@@ -92,6 +101,7 @@ func load_mods() -> void:
 	# Get mod paths.
 	if not mods_path.is_empty():
 		var mod_paths := PackedStringArray()
+		if not DirAccess.dir_exists_absolute(mods_path): DirAccess.make_dir_recursive_absolute(mods_path)
 		for dir_path:String in DirAccess.get_directories_at(mods_path):
 			mod_paths.append(mods_path+'/'+dir_path)
 
@@ -133,43 +143,104 @@ func load_mods() -> void:
 			TesseractUtils.walk_dir(mod_path, func(file_path:String) -> void:
 				var relative_path:String = file_path.trim_prefix(mod_path+'/')
 				if relative_path in ['INIT.gd','MOD.cfg']: return
-				var resource_path:String = 'res://'+load_into_path+('' if load_into_path.ends_with('/') else '/')+'%s' % relative_path
+				var res_path:String = 'res://'+load_into_path+('' if load_into_path.ends_with('/') else '/')+'%s' % relative_path
 				var ext:String = file_path.split('.')[-1]
 				# Load resource.
-				if ext in ['tres','res','tscn','scn','gd','gdshader','theme','material']:
+				if ext in ['tres','res','tscn','scn','gd','gdshader','gdshaderinc','theme','material']:
 					var res = load(file_path)
 					if res is Script && not allow_mod_scripts: return
-					if res:
-						res.take_over_path(resource_path)
-						mod_instance.resources.append(res)
+					if res is PackedScene:
+						_load_mod_scene(mod_instance, res, res_path, file_path)
+					elif res:
+						_load_mod_resource(mod_instance, res, res_path)
 				# Load image.
 				elif ext in ['svg','png','jpg','jpeg']:
 					var res = Image.load_from_file(file_path)
 					if res:
-						res.take_over_path(resource_path)
-						mod_instance.resources.append(res)
+						res.take_over_path(res_path)
+						if not mod_instance.resources.has(res): mod_instance.resources.append(res)
 				# Load config.
 				elif ext in ['cfg']:
 					var res = ConfigFile.new()
-					var res_err:Error = res.load(file_path)
-					if res_err == OK:
-						if res.has_section('SceneVariables'):
-							var scene_path:String = resource_path.trim_suffix('.cfg')
-							mod_instance.scene_variables.set(scene_path, {})
-							for key:String in res.get_section_keys('SceneVariables'):
-								mod_instance.scene_variables[scene_path].set(key, res.get_value('SceneVariables',key))
-							var scene = load(scene_path)
-							if scene is PackedScene:
-								var variable_setter := SceneVariableSetter.new()
-								variable_setter.name = 'SceneVariableSetter'
-								variable_setter.mod_instance_name = mod_instance.name
-								var scene_instance = scene.instantiate()
-								scene_instance.add_child(variable_setter)
-								variable_setter.owner = scene_instance
-								scene.pack(scene_instance)
-								scene.take_over_path(scene_path)
-								mod_instance.resources.append(scene)
+					_load_mod_cfg(mod_instance, res, res_path, file_path)
 			)
 			# Initialize mod.
 			mod_instance.init()
 			mod_instances.set(mod_instance.name, mod_instance)
+
+
+func _load_mod_resource(mod_instance:TesseractMod, res:Resource, res_path:String) -> void:
+	res.take_over_path(res_path)
+	if not mod_instance.resources.has(res): mod_instance.resources.append(res)
+
+
+func _load_mod_scene(mod_instance:TesseractMod, res:PackedScene, res_path:String, file_path:String) -> void:
+	var scene_instance:Node = res.instantiate()
+	# Merge scenes.
+	if scene_instance is SceneMerger:
+		# Get base scene.
+		var base_scene = load(res_path) as PackedScene
+		if base_scene is not PackedScene: return
+		var base_scene_instance:Node = base_scene.instantiate()
+		# Add included nodes.
+		for node:Node in scene_instance.included_nodes:
+			if not node: continue
+			var node_path:NodePath = scene_instance.get_path_to(node)
+			# Get base nodes.
+			var base_node = base_scene_instance.get_node_or_null(node_path)
+			var base_parent = base_scene_instance.get_node_or_null(scene_instance.get_path_to(node.get_parent()))
+			if not base_parent: continue
+			# Replace old node with new node.
+			var base_node_index:int = -1
+			var base_node_has_unique_name:bool = false
+			# Remove old node.
+			if base_node:
+				base_node_index = base_node.get_index()
+				base_node_has_unique_name = base_node.unique_name_in_owner
+				base_node.unique_name_in_owner = false
+				base_parent.remove_child(base_node)
+				base_node.queue_free()
+			# Add new node.
+			node.get_parent().remove_child(node)
+			node.owner = null # Unset owner.
+			base_parent.add_child(node)
+			base_parent.move_child(node, base_node_index) # Set proper order.
+			node.owner = base_parent # Set owner to base parent.
+			# Add unique name if the base node was using one.
+			if base_node_has_unique_name:
+				node.unique_name_in_owner = true
+
+		# Remove nodes.
+		for node_path:String in scene_instance.remove_node_paths:
+			var node = base_scene_instance.get_node_or_null(node_path) as Node
+			if not node: continue
+			node.get_parent().remove_child(node)
+			node.queue_free()
+
+		# Pack the merged scene.
+		res.pack(base_scene_instance)
+
+
+	res.take_over_path(res_path)
+	if not mod_instance.resources.has(res): mod_instance.resources.append(res)
+
+
+func _load_mod_cfg(mod_instance:TesseractMod, res:ConfigFile, res_path:String, file_path:String) -> void:
+	var res_err:Error = res.load(file_path)
+	if res_err == OK:
+		if res.has_section('SceneVariables'):
+			var scene_path:String = res_path.trim_suffix('.cfg')
+			mod_instance.scene_variables.set(scene_path, {})
+			for key:String in res.get_section_keys('SceneVariables'):
+				mod_instance.scene_variables[scene_path].set(key, res.get_value('SceneVariables',key))
+			var scene = load(scene_path)
+			if scene is PackedScene:
+				var variable_setter := SceneVariableSetter.new()
+				variable_setter.name = 'SceneVariableSetter'
+				variable_setter.mod_instance_name = mod_instance.name
+				var scene_instance:Node = scene.instantiate()
+				scene_instance.add_child(variable_setter)
+				variable_setter.owner = scene_instance
+				scene.pack(scene_instance)
+				scene.take_over_path(scene_path)
+				if not mod_instance.resources.has(scene): mod_instance.resources.append(scene)

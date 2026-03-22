@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="Tesseract (modding platform)"
+config/name="Tesseract"
 run/main_scene="uid://n203b1ovbyaa"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 

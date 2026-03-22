@@ -30,6 +30,14 @@ Not all of the listed features are complete or implemented at all.
   - Specify assets for mods to use.
 
 
+# Plugin setup
+There is a slight setup process you need to go through before mods can work for your game & before developers can start modding your game.
+
+1. Edit `addons/tesseract/plugin.cfg` to your liking. You can change how & where mods are loaded among many other things.
+2. Add plugin config file `addons/tesseract/plugin.cfg` to export includes. This will allow the plugin to work after export.
+   <img src="./git_assets/export_includes.png" align=""></img>
+
+
 # Install & use mods
 For the end user, installing mods should be as simple & seamless as possible. The user only has 2 things they need to do, or if your game has built-in mod management (importing, reordering & toggling) 0 things!
 
@@ -89,6 +97,9 @@ Your script file should be located in the *root directory of your mod* & have th
 ## Adding content
 Files in your mod are directly imported into the virtual file system of the game, this means things can be overwritten & can break if you aren't careful (given that the game is very permissive of mods).
 Always follow the game's documentation for locations to put your mod files.
+
+Also, never referene any resources created inside your mod! For example, don't use a texture from your mod inside a scene, the reference will be to the one inside the project, not the mod.
+To properly reference assets in your modded scenes, use the `AssetLinker` node.
 
 There is not anything else to say here, the rest is up to the game itself to document.
 

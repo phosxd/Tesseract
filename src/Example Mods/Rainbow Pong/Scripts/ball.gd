@@ -1,5 +1,9 @@
 extends Area2D
 
+# Color & trail color are only here to keep compatatibility, they are not used.
+var color: Color
+var trail_color: Color
+
 var colors := PackedColorArray([
 	Color.RED,
 	Color.ORANGE_RED,
