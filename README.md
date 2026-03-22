@@ -10,32 +10,62 @@ Tesseract is a (work in progress) advanced modding platform for Godot 4 that giv
 
 ---
 
+# Table of contents
+- [Features](#features)
+  - [Load from PCK, ZIP, & folder](load-from-pck-zip-folder)
+  - [No unnecessary bundling](#no-unnecessary-bundling)
+  - [Extensive sandboxing](#extensive-sandboxing)
+  - [Detailed metadata](#detailed-metadata)
+- [Plugin setup (games)](#plugin-setup-games)
+- [Plugin setup (mods)](#plugin-setup-mods)
+- [Install & use mods](#install-use-mods)
+- [Create a basic mod](#create-a-basic-mod)
+- [A guide on creating moddable games](#a-guide-on-creating-moddable-games)
+
 # Features
-Not all of the listed features are complete or implemented at all.
+## Load from PCK, ZIP, & folder
+Tesseract can load mods from PCK files, ZIP (or TMOD) files, as well as straight from a folder.
 
-- Load mods from PCK, ZIP (TMOD), or folder.
-  - Seamlessly drag DLC/mod content out of Godot & into any game's designated mods folder.
-  - Export mods as TMOD ZIP files for compression, encryption, & ease of sharing.
-- Dependency free mods.
-  - Load & export mods without bundling unnecessary files (unavailable for PCK loader).
-- Extensive sandboxing.
-  - Choose which folders mods are allowed to overwrite.
-  - Regulate or block script usage.
-  - Force mods to load into a dedicated folder.
-- Mod metadata.
-  - Name, author, version, description, etc.
-  - Specify compatible game versions.
-- Customizable game API.
-  - Send & recieve signals from mods.
-  - Specify assets for mods to use.
+Zipped & folder mods are fully featured & an utilize Tesseract to it's full potetial. However PCKs are Godot's built-in solution which doesn't support metadata, sandboxing, or entry point scripts which being larger due to dependency bundling.
+
+Loading from folder is my favorite way for quick testing, you just drag the folder sraight from your Godot project then into the game's designated mods folder, no exporting, no packing, it's simple.
+
+## No unnecessary bundling
+Unlike with PCKs, Tesseract mods don't have to bundle in every asset it uses from the base game, you can just use it & as long as it stays available in the base game you have nothing to worry about.
+Although if you'd like, you can still bundle game assets into your mod, but beware it will overwrite the base game's original file.
+
+## Extensive sandboxing
+The most powerful aspect of Tesseract has got to be it's sandboxing capabilities. Game developers can specify "mod types" each with their own set of permissions, any mod that specifies a mod type will inherit it's permissions.
+
+With Tesseract, game developers can choose where in the virtual filesystem mod files are loaded into, regulate / block script ussage, & choose which files mods are allowed to overwrite.
+
+## Detailed metadata
+Tesseract mods use `.cfg` files as their manifest, making it easy to integrate & read from within your game. Mods are also loaded as a unique `TesseractMod` object that holds all the metadata, & also can be interacted with if the mod has an entry point script.
+
+Mods are not required to specify all possible metadata values, just the bare minimum like name, version, & compatible Tesseract / game versions.
+Here is a list of all built-in metadata fields:
+- *name: String
+- *version_number: int
+- *for_game_versions: Array[int]
+- *for_tesseract_versions: Array[int]
+- author: String
+- version_string: String
+- description_short: String
+- description_long: String
+
+Mods can provide any additional metadata fields they want.
 
 
-# Plugin setup
+# Plugin setup (games)
 There is a slight setup process you need to go through before mods can work for your game & before developers can start modding your game.
 
 1. Edit `addons/tesseract/plugin.cfg` to your liking. You can change how & where mods are loaded among many other things.
 2. Add plugin config file `addons/tesseract/plugin.cfg` to export includes. This will allow the plugin to work after export.
    <img src="./git_assets/export_includes.png" align=""></img>
+
+
+# Plugin setup (mods)
+Currently there is no setup process for mod developers when it comes to the actual plugin.
 
 
 # Install & use mods
