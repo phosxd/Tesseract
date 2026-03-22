@@ -98,7 +98,9 @@ version_string="1.0.0"
 ; Version of the mod.
 version_number=1
 ; All game API versions this mod is expected to work for.
-game_versions=[1]
+for_game_versions=[1]
+; All Tesseract versions this mod is expected to work for.
+for_tesseract_versions=[1]
 description_short="Short description of this mod."
 description_long="Long description of this mod, should include a list of all changes made."
 ```

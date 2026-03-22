@@ -7,6 +7,9 @@
 ## Set [param signal_map] to provide signals that mods can call.
 extends Node
 
+## Tesseract API version.
+const api_version:int = 1
+
 ## Assets available to mods. This is only used in [AssetLinker].
 var asset_map:Dictionary[String,Variant] = {}
 ## Signals available to mods.
@@ -15,6 +18,14 @@ var signal_map:Dictionary[String,Signal] = {}
 #region config
 
 var config := ConfigFile.new()
+
+## Current version of the game's API.
+var game_api_version: Variant:
+	set(value):
+		game_api_version = value
+		config.set_value('game', 'api_version', value)
+	get():
+		return config.get_value('game', 'api_version')
 
 ## Path to load PCKs from. If is an empty string, PCK loading is disabled.
 var patches_path: String:
@@ -120,13 +131,22 @@ func load_mods() -> void:
 			var mod_type:String = mod_config.get_value('TesseractMod', 'type', '')
 			var mod_type_section:String = 'MOD TYPE: %s' % mod_type
 
-			var load_into_path:String = config.get_value(mod_type_section, 'load_mods_into_path', load_mods_into_path)
-			var allow_mod_scripts:bool = config.get_value(mod_type_section, 'allow_mod_scripts', allow_mod_scripts)
+			var cfg_game_api_version = config.get_value(mod_type_section, 'api_version', game_api_version)
+			var cfg_load_into_path:String = config.get_value(mod_type_section, 'load_mods_into_path', load_mods_into_path)
+			var cfg_allow_mod_scripts:bool = config.get_value(mod_type_section, 'allow_mod_scripts', allow_mod_scripts)
+			var for_game_versions:Array[Variant] = mod_config.get_value('TesseractMod', 'for_game_versions', [cfg_game_api_version])
+			var for_tesseract_versions:Array[Variant] = mod_config.get_value('TesseractMod', 'for_tesseract_versions', [api_version])
+			if cfg_game_api_version not in for_game_versions:
+				TesseractErrorServer.warning.emit(2, [mod_path])
+				continue
+			if api_version not in for_tesseract_versions :
+				TesseractErrorServer.warning.emit(3, [mod_path])
+				continue
 
 			# Get mod script.
 			var mod_script_path:String = mod_path+'/INIT.gd'
 			var mod_script
-			if allow_mod_scripts && FileAccess.file_exists(mod_script_path):
+			if cfg_allow_mod_scripts && FileAccess.file_exists(mod_script_path):
 				mod_script = load(mod_script_path) as GDScript
 			# If none found or is invalid, use backup script.
 			if mod_script is not GDScript or mod_script.get_base_script() != TesseractMod:
@@ -143,12 +163,12 @@ func load_mods() -> void:
 			TesseractUtils.walk_dir(mod_path, func(file_path:String) -> void:
 				var relative_path:String = file_path.trim_prefix(mod_path+'/')
 				if relative_path in ['INIT.gd','MOD.cfg']: return
-				var res_path:String = 'res://'+load_into_path+('' if load_into_path.ends_with('/') else '/')+'%s' % relative_path
+				var res_path:String = 'res://'+cfg_load_into_path+('' if cfg_load_into_path.ends_with('/') else '/')+'%s' % relative_path
 				var ext:String = file_path.split('.')[-1]
 				# Load resource.
 				if ext in ['tres','res','tscn','scn','gd','gdshader','gdshaderinc','theme','material']:
 					var res = load(file_path)
-					if res is Script && not allow_mod_scripts: return
+					if res is Script && not cfg_allow_mod_scripts: return
 					if res is PackedScene:
 						_load_mod_scene(mod_instance, res, res_path, file_path)
 					elif res:

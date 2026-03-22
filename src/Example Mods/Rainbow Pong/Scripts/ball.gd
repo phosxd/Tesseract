@@ -33,6 +33,7 @@ func _process(delta:float) -> void:
 
 func _draw() -> void:
 	# Get color.
+	@warning_ignore('shadowed_variable')
 	var color = colors.get(wrap(color_iter,0, colors.size()))
 	color_iter += 1
 

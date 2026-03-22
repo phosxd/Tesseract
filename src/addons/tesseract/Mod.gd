@@ -15,7 +15,9 @@ var version_string:String = '1.0.0'
 ## The mod version.
 var version_number:int = 1
 ## The game version(s) this mod was made for.
-var game_versions:Array[int] = [1]
+var for_game_versions:Array[int] = [1]
+## The Tesseract version(s) this mod was made for.
+var for_tesseract_verions:Array[int] = [1]
 
 ## Short description of the mod. Optional.
 var description_short: String
