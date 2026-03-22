@@ -46,7 +46,7 @@ Mods are not required to specify all possible metadata values, just the bare min
 Here is a list of all built-in metadata fields:
 - *name: String
 - *version_number: int
-- *for_game_versions: Array[int]
+- *for_game_versions: Array[Variant]
 - *for_tesseract_versions: Array[int]
 - author: String
 - version_string: String
