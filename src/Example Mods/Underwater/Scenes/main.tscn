@@ -18,3 +18,4 @@ metadata/_custom_type_script = "uid://b46movjli0m6g"
 [node name="Background" type="ColorRect" parent="." unique_id=431782879]
 offset_right = 700.0
 offset_bottom = 400.0
+color = Color(0, 0, 0, 0)

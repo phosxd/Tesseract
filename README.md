@@ -44,10 +44,11 @@ Tesseract mods use `.cfg` files as their manifest, making it easy to integrate &
 
 Mods are not required to specify all possible metadata values, just the bare minimum like name, version, & compatible Tesseract / game versions.
 Here is a list of all built-in metadata fields:
-- *name: String
+- *id: String
 - *version_number: int
 - *for_game_versions: Array[Variant]
 - *for_tesseract_versions: Array[int]
+- name: String
 - author: String
 - version_string: String
 - description_short: String
