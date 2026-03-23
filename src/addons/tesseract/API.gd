@@ -126,6 +126,10 @@ func load_mods() -> void:
 			if mod_config_err != OK:
 				TesseractErrorServer.warning.emit(1, [mod_path])
 				if not allow_mods_without_details: continue
+			var id = mod_config.get_value('TesseractMod', 'id', '')
+			if id is not String or id.is_empty() or id in mod_instances.keys():
+				TesseractErrorServer.warning.emit(4, [mod_path])
+				continue
 
 			# Get game configuration for mods of this type.
 			var mod_type:String = mod_config.get_value('TesseractMod', 'type', '')
@@ -134,6 +138,7 @@ func load_mods() -> void:
 			var cfg_game_api_version = config.get_value(mod_type_section, 'api_version', game_api_version)
 			var cfg_load_into_path:String = config.get_value(mod_type_section, 'load_mods_into_path', load_mods_into_path)
 			var cfg_allow_mod_scripts:bool = config.get_value(mod_type_section, 'allow_mod_scripts', allow_mod_scripts)
+			# Check version compatibility.
 			var for_game_versions:Array[Variant] = mod_config.get_value('TesseractMod', 'for_game_versions', [cfg_game_api_version])
 			var for_tesseract_versions:Array[Variant] = mod_config.get_value('TesseractMod', 'for_tesseract_versions', [api_version])
 			if cfg_game_api_version not in for_game_versions:
@@ -186,7 +191,7 @@ func load_mods() -> void:
 			)
 			# Initialize mod.
 			mod_instance.init()
-			mod_instances.set(mod_instance.name, mod_instance)
+			mod_instances.set(mod_instance.id, mod_instance)
 
 
 func _load_mod_resource(mod_instance:TesseractMod, res:Resource, res_path:String) -> void:
@@ -240,27 +245,27 @@ func _load_mod_scene(mod_instance:TesseractMod, res:PackedScene, res_path:String
 		# Pack the merged scene.
 		res.pack(base_scene_instance)
 
-
 	res.take_over_path(res_path)
 	if not mod_instance.resources.has(res): mod_instance.resources.append(res)
 
 
 func _load_mod_cfg(mod_instance:TesseractMod, res:ConfigFile, res_path:String, file_path:String) -> void:
 	var res_err:Error = res.load(file_path)
-	if res_err == OK:
-		if res.has_section('SceneVariables'):
-			var scene_path:String = res_path.trim_suffix('.cfg')
-			mod_instance.scene_variables.set(scene_path, {})
-			for key:String in res.get_section_keys('SceneVariables'):
-				mod_instance.scene_variables[scene_path].set(key, res.get_value('SceneVariables',key))
-			var scene = load(scene_path)
-			if scene is PackedScene:
-				var variable_setter := SceneVariableSetter.new()
-				variable_setter.name = 'SceneVariableSetter'
-				variable_setter.mod_instance_name = mod_instance.name
-				var scene_instance:Node = scene.instantiate()
-				scene_instance.add_child(variable_setter)
-				variable_setter.owner = scene_instance
-				scene.pack(scene_instance)
-				scene.take_over_path(scene_path)
-				if not mod_instance.resources.has(scene): mod_instance.resources.append(scene)
+	if res_err != OK: return
+	if not res.has_section('SceneVariables'): return
+
+	var scene_path:String = res_path.trim_suffix('.cfg')
+	mod_instance.scene_variables.set(scene_path, {})
+	for key:String in res.get_section_keys('SceneVariables'):
+		mod_instance.scene_variables[scene_path].set(key, res.get_value('SceneVariables',key))
+	var scene = load(scene_path)
+	if scene is PackedScene:
+		var variable_setter := SceneVariableSetter.new()
+		variable_setter.name = 'SceneVariableSetter'
+		variable_setter.mod_instance_id = mod_instance.id
+		var scene_instance:Node = scene.instantiate()
+		scene_instance.add_child(variable_setter)
+		variable_setter.owner = scene_instance
+		scene.pack(scene_instance)
+		scene.take_over_path(scene_path)
+		if not mod_instance.resources.has(scene): mod_instance.resources.append(scene)

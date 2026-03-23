@@ -6,6 +6,8 @@ var config: ConfigFile
 var scene_variables:Dictionary[String,Dictionary] = {}
 
 ## Unique mod identifier.
+var id: String
+## Mod display name.
 var name: String
 ## Mod author. Optional.
 var author: String

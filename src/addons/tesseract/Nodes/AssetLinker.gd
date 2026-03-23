@@ -22,4 +22,4 @@ func _ready() -> void:
 	else:
 		asset = TesseractAPI.asset_map.get(asset_name)
 
-	node.set(node_property, asset)
+	if asset != null: node.set(node_property, asset)

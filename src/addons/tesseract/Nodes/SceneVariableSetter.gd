@@ -1,12 +1,12 @@
 ## Internally used to set scene variables. Should not be added to any scenes.
 class_name SceneVariableSetter extends Node
 
-@export var mod_instance_name: String
+@export var mod_instance_id: String
 
 
 func _ready() -> void:
 	var node = get_parent()
-	var mod_instance = TesseractAPI.mod_instances.get(mod_instance_name)
+	var mod_instance = TesseractAPI.mod_instances.get(mod_instance_id)
 
 	if mod_instance:
 		if not node.scene_file_path.is_empty() && mod_instance:

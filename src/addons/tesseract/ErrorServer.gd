@@ -11,6 +11,7 @@ const warning_strings:Array[String] = [
 	'Mod at "%s" is missing config file, unable to get details.',
 	'Mod at "%s" is not compatible with game\'s API version.',
 	'Mod at "%s" is not compatible with the current version of Tesseract.',
+	'Mod at "%s" has an invalid or overlapping ID. Make sure the mod\'s ID is not the same as another mod.',
 ]
 
 const info_strings:Array[String] = [

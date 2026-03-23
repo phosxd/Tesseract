@@ -89,7 +89,10 @@ Depending on the game, they may have you specify additional parameters for your 
 Here is what a basic config file looks like:
 ```ini
 [TesseractMod]
-; Unique name of the mod.
+; Unique mod identifier. This should be somethig highly unlikely to be used in other mods.
+; Prefixing the ID with the author name is a good way of differentiating mods with the same name.
+id="John Doe's Mod'"
+; Mod display name.
 name="My Mod"
 ; Author of the mod.
 author="John Doe"
