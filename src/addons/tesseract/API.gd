@@ -163,33 +163,39 @@ func load_mods() -> void:
 
 			# Walk through all resources in the mod & load them.
 			var resources:Array[Resource] = []
-			TesseractUtils.walk_dir(mod_path, func(file_path:String) -> void:
-				var relative_path:String = file_path.trim_prefix(mod_path+'/')
-				if relative_path in ['INIT.gd','MOD.cfg']: return
-				var res_path:String = 'res://'+cfg_load_into_path+('' if cfg_load_into_path.ends_with('/') else '/')+'%s' % relative_path
-				var ext:String = file_path.split('.')[-1]
-				# Load resource.
-				if ext in ['tres','res','tscn','scn','gd','gdshader','gdshaderinc','theme','material']:
-					var res = load(file_path)
-					if res is Script && not cfg_allow_mod_scripts: return
-					if res is PackedScene:
-						_load_mod_scene(mod_instance, relative_path, res, res_path, file_path)
-					elif res:
-						_load_mod_resource(mod_instance, relative_path, res, res_path)
-				# Load image.
-				elif ext in ['svg','png','jpg','jpeg']:
-					var res = Image.load_from_file(file_path)
-					if res:
-						res.take_over_path(res_path)
-						if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
-				# Load config.
-				elif ext in ['cfg']:
-					var res = ConfigFile.new()
-					_load_mod_cfg(mod_instance, relative_path, res, res_path, file_path)
-			)
+			TesseractUtils.walk_dir(mod_path, _load_into_mod.bind(mod_path, mod_instance, {
+				'load_into_path': cfg_load_into_path,
+				'allow_mod_scripts': cfg_allow_mod_scripts,
+			},''))
 			# Initialize mod.
 			mod_instance.init()
 			mod_instances.set(mod_instance.id, mod_instance)
+
+
+func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod, cfg:Dictionary, requested_by:String='') -> void:
+	var relative_path:String = file_path.trim_prefix(mod_path+'/')
+	if relative_path in ['INIT.gd','MOD.cfg']: return
+	if relative_path in mod_instance.resources.keys(): return
+	var res_path:String = 'res://'+cfg.load_into_path+('' if cfg.load_into_path.ends_with('/') or cfg.load_into_path.is_empty() else '/')+'%s' % relative_path
+	var ext:String = file_path.split('.')[-1]
+	# Load resource.
+	if ext in ['tres','res','tscn','scn','gd','gdshader','gdshaderinc','theme','material']:
+		var res = load(file_path)
+		if res is Script && not cfg.allow_mod_scripts: return
+		if res is PackedScene:
+			_load_mod_scene(mod_instance, relative_path, res, res_path, file_path)
+		elif res:
+			_load_mod_resource(mod_instance, relative_path, res, res_path)
+	# Load image.
+	elif ext in ['svg','png','jpg','jpeg']:
+		var res = Image.load_from_file(file_path)
+		if res:
+			res.take_over_path(res_path)
+			if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
+	# Load config.
+	elif ext in ['cfg']:
+		var res = ConfigFile.new()
+		_load_mod_cfg(mod_instance, relative_path, res, res_path, file_path)
 
 
 func _load_mod_resource(mod_instance:TesseractMod, relative_path:String, res:Resource, res_path:String) -> void:

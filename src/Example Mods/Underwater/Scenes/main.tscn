@@ -5,7 +5,7 @@
 
 [node name="Main" type="Node" unique_id=1385759991 node_paths=PackedStringArray("included_nodes")]
 script = ExtResource("1_6oqqb")
-included_nodes = [NodePath("Background"), NodePath("BG Material Asset Linker")]
+included_nodes = [NodePath("BG Material Asset Linker"), NodePath("Background")]
 metadata/_custom_type_script = "uid://54hah8qtvily"
 
 [node name="BG Material Asset Linker" type="Node" parent="." unique_id=92497016 node_paths=PackedStringArray("node")]
