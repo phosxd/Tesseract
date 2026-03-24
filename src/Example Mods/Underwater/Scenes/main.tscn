@@ -10,7 +10,7 @@ metadata/_custom_type_script = "uid://54hah8qtvily"
 
 [node name="BG Material Asset Linker" type="Node" parent="." unique_id=92497016 node_paths=PackedStringArray("node")]
 script = ExtResource("2_pn4g5")
-asset_path = "Example Game/Assets/underwater.material"
+mod_asset_path = "Assets/underwater.material"
 node = NodePath("../Background")
 node_property = "material"
 metadata/_custom_type_script = "uid://b46movjli0m6g"

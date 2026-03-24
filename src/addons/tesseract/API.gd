@@ -10,8 +10,6 @@ extends Node
 ## Tesseract API version.
 const api_version:int = 1
 
-## Assets available to mods. This is only used in [AssetLinker].
-var asset_map:Dictionary[String,Variant] = {}
 ## Signals available to mods.
 var signal_map:Dictionary[String,Signal] = {}
 
@@ -175,32 +173,39 @@ func load_mods() -> void:
 					var res = load(file_path)
 					if res is Script && not cfg_allow_mod_scripts: return
 					if res is PackedScene:
-						_load_mod_scene(mod_instance, res, res_path, file_path)
+						_load_mod_scene(mod_instance, relative_path, res, res_path, file_path)
 					elif res:
-						_load_mod_resource(mod_instance, res, res_path)
+						_load_mod_resource(mod_instance, relative_path, res, res_path)
 				# Load image.
 				elif ext in ['svg','png','jpg','jpeg']:
 					var res = Image.load_from_file(file_path)
 					if res:
 						res.take_over_path(res_path)
-						if not mod_instance.resources.has(res): mod_instance.resources.append(res)
+						if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
 				# Load config.
 				elif ext in ['cfg']:
 					var res = ConfigFile.new()
-					_load_mod_cfg(mod_instance, res, res_path, file_path)
+					_load_mod_cfg(mod_instance, relative_path, res, res_path, file_path)
 			)
 			# Initialize mod.
 			mod_instance.init()
 			mod_instances.set(mod_instance.id, mod_instance)
 
 
-func _load_mod_resource(mod_instance:TesseractMod, res:Resource, res_path:String) -> void:
+func _load_mod_resource(mod_instance:TesseractMod, relative_path:String, res:Resource, res_path:String) -> void:
 	res.take_over_path(res_path)
-	if not mod_instance.resources.has(res): mod_instance.resources.append(res)
+	if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
 
 
-func _load_mod_scene(mod_instance:TesseractMod, res:PackedScene, res_path:String, file_path:String) -> void:
+func _load_mod_scene(mod_instance:TesseractMod, relative_path:String, res:PackedScene, res_path:String, file_path:String) -> void:
 	var scene_instance:Node = res.instantiate()
+
+	# Apply mod id to asset linker nodes.
+	for node in scene_instance.find_children('*'):
+		if node is not AssetLinker: continue
+		node = node as AssetLinker
+		node.mod_id = mod_instance.id
+
 	# Merge scenes.
 	if scene_instance is SceneMerger:
 		# Get base scene.
@@ -246,10 +251,10 @@ func _load_mod_scene(mod_instance:TesseractMod, res:PackedScene, res_path:String
 		res.pack(base_scene_instance)
 
 	res.take_over_path(res_path)
-	if not mod_instance.resources.has(res): mod_instance.resources.append(res)
+	if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
 
 
-func _load_mod_cfg(mod_instance:TesseractMod, res:ConfigFile, res_path:String, file_path:String) -> void:
+func _load_mod_cfg(mod_instance:TesseractMod, relative_path:String, res:ConfigFile, res_path:String, file_path:String) -> void:
 	var res_err:Error = res.load(file_path)
 	if res_err != OK: return
 	if not res.has_section('SceneVariables'): return
@@ -268,4 +273,4 @@ func _load_mod_cfg(mod_instance:TesseractMod, res:ConfigFile, res_path:String, f
 		variable_setter.owner = scene_instance
 		scene.pack(scene_instance)
 		scene.take_over_path(scene_path)
-		if not mod_instance.resources.has(scene): mod_instance.resources.append(scene)
+		if not mod_instance.resources.values().has(scene): mod_instance.resources.set(relative_path, scene)

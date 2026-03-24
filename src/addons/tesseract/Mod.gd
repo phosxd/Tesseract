@@ -26,8 +26,8 @@ var description_short: String
 ## Long description of the mod. Optional.
 var description_long: String
 
-## All resources loaded from this mod.
-var resources:Array[Resource] = []
+## All resources loaded from this mod & their paths relative to the mod's root directory.
+var resources:Dictionary[String,Resource] = {}
 
 ## Called when the mod is initialized.
 @abstract func init() -> void
