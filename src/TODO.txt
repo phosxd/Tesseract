@@ -1,4 +1,1 @@
 - Add ability to toggle enabled mods at run time & reset virtual file system without restarting.
-- Implement custom handling for resources that use `.import` files for configuration.
-
-- Add methods for grabbing all directories & files from a mod.

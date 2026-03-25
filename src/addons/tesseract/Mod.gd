@@ -46,3 +46,38 @@ func send_signal(name:String, ...args) -> Error:
 	sig.emit.callv(args)
 
 	return OK
+
+
+## Returns all directories from this mod.
+func get_directories() -> PackedStringArray:
+	var result := PackedStringArray()
+	for path:String in resources:
+		var dir:String = path.trim_suffix('/'+path.split('/')[-1])
+		if dir not in result: result.append(dir)
+
+	return result
+
+
+## Returns all directories under [param path] from this mod.
+func get_directories_at(path:String) -> PackedStringArray:
+	var result := PackedStringArray()
+	var all_dirs:PackedStringArray = get_directories()
+	for path_:String in all_dirs:
+		if path_ == path or not path_.begins_with(path): continue
+		var dir:String = path_.trim_prefix(path+'/')
+		if not dir.is_empty() && dir not in result: result.append(dir)
+
+	return result
+
+
+## Returns all file paths under [param path] from this mod.
+## To get the resources from these paths, use [param resources].
+func get_files_at(path:String) -> PackedStringArray:
+	var result := PackedStringArray()
+	var all_files:Array[String] = resources.keys()
+	for path_:String in all_files:
+		if path_ == path or not path_.begins_with(path): continue
+		var dir:String = path_.trim_prefix(path+'/')
+		if not dir.is_empty() && not dir.contains('/') && dir not in result: result.append(dir)
+
+	return result
