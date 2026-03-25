@@ -37,7 +37,9 @@ Although if you'd like, you can still bundle game assets into your mod, but bewa
 ## Extensive sandboxing
 The most powerful aspect of Tesseract has got to be it's sandboxing capabilities. Game developers can specify "mod types" each with their own set of permissions, any mod that specifies a mod type will inherit it's permissions.
 
-With Tesseract, game developers can choose where in the virtual filesystem mod files are loaded into, regulate / block script ussage, & choose which files mods are allowed to overwrite.
+With Tesseract, game developers can choose where in the virtual filesystem mod files are loaded into, regulate / block script usage, & choose which files mods are allowed to overwrite.
+
+By "regulate script usage" I mean you can either outright block all use of built-in & external scripts, or you can add blocked keywords which while not a full solution does help deter mallicious actors.
 
 ## Detailed metadata
 Tesseract mods use `.cfg` files as their manifest, making it easy to integrate & read from within your game. Mods are also loaded as a unique `TesseractMod` object that holds all the metadata, & also can be interacted with if the mod has an entry point script.
