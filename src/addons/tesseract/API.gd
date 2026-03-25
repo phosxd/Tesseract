@@ -9,6 +9,34 @@ extends Node
 
 ## Tesseract API version.
 const api_version:int = 1
+const resource_extensions:Array[String] = [
+	# Standard resource.
+	'tres','res',
+	# Audio.
+	'wav',
+	'mp3',
+	'ogg',
+	'flac',
+	# Scene.
+	'tscn',
+	'scn',
+	# Script.
+	'gd',
+	# Shader.
+	'gdshader',
+	'gdshaderinc',
+	# Theme / stylebox.
+	'theme',
+	'stylebox',
+	# Material.
+	'material',
+	# Misc.
+	'anim',
+	'occ',
+	'shape',
+	'json',
+]
+const image_extensions:Array[String] = ['svg','png','jpg','jpeg']
 
 ## Signals available to mods.
 var signal_map:Dictionary[String,Signal] = {}
@@ -124,10 +152,18 @@ func load_mods() -> void:
 			if mod_config_err != OK:
 				TesseractErrorServer.warning.emit(1, [mod_path])
 				if not allow_mods_without_details: continue
+			# Check ID is valid.
 			var id = mod_config.get_value('TesseractMod', 'id', '')
-			if id is not String or id.is_empty() or id in mod_instances.keys():
+			if id is not String or id.is_empty() or id in mod_instances:
 				TesseractErrorServer.warning.emit(4, [mod_path])
 				continue
+			# Check mod dependencies are loaded.
+			var mod_dependencies = mod_config.get_value('TesseractMod', 'mod_dependencies', [])
+			if mod_dependencies is Array && not mod_dependencies.is_empty():
+				for depedency in mod_dependencies:
+					if depedency is not String: continue
+					if depedency not in mod_instances:
+						TesseractErrorServer.error.emit(2, [mod_path,depedency])
 
 			# Get game configuration for mods of this type.
 			var mod_type:String = mod_config.get_value('TesseractMod', 'type', '')
@@ -179,7 +215,7 @@ func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod
 	var res_path:String = 'res://'+cfg.load_into_path+('' if cfg.load_into_path.ends_with('/') or cfg.load_into_path.is_empty() else '/')+'%s' % relative_path
 	var ext:String = file_path.split('.')[-1]
 	# Load resource.
-	if ext in ['tres','res','tscn','scn','gd','gdshader','gdshaderinc','theme','material']:
+	if ext in resource_extensions:
 		var res = load(file_path)
 		if res is Script && not cfg.allow_mod_scripts: return
 		if res is PackedScene:
@@ -187,7 +223,7 @@ func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod
 		elif res:
 			_load_mod_resource(mod_instance, relative_path, res, res_path)
 	# Load image.
-	elif ext in ['svg','png','jpg','jpeg']:
+	elif ext in image_extensions:
 		var res = Image.load_from_file(file_path)
 		if res:
 			res.take_over_path(res_path)

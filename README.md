@@ -53,6 +53,7 @@ Here is a list of all built-in metadata fields:
 - version_string: String
 - description_short: String
 - description_long: String
+- mod_dependencies: Array[String]
 
 Mods can provide any additional metadata fields they want.
 
@@ -107,6 +108,9 @@ for_game_versions=[1]
 for_tesseract_versions=[1]
 description_short="Short description of this mod."
 description_long="Long description of this mod, should include a list of all changes made."
+
+; Optional. Mod IDs that must be present & loaded before this mod.
+mod_dependencies=["Other Mod 1", "Other Mod 2"]
 ```
 
 Your config file should be located in the *root directory of your mod* & have the exact name `MOD.cfg`.

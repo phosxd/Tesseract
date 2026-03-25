@@ -4,6 +4,7 @@ extends Node
 const error_strings:Array[String] = [
 	'%s',
 	'Failed to load game config.',
+	'Mod at "%s" is missing depedency "%s". Ensure the dependency is loaded before this mod.',
 ]
 
 const warning_strings:Array[String] = [
