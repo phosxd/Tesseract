@@ -45,8 +45,8 @@ func _on_ball_body_entered(body:Node2D) -> void:
 	elif body == %'Bottom Border': normal = Vector2(0,-1)
 
 	%Ball.velocity = %Ball.velocity.bounce(normal)
-	%Ball.velocity.x *= 1.025
-	%Ball.velocity.y += %Ball.position.y-center.y
+	%Ball.velocity.x *= 1.01
+	%Ball.velocity.y += (%Ball.position.y-center.y)*2
 
 
 func _on_left_goal_area_entered(area:Area2D) -> void:
