@@ -9,7 +9,9 @@ const error_strings:Array[String] = [
 	'Mod "%s": Missing depedency "%s", ensure the dependency is loaded before this mod.',
 	'Mod "%s": Not compatible with game\'s API version.',
 	'Mod "%s": Not compatible with the current version of Tesseract.',
-	'Mod "%s": Script "%s" contains one or more blocked keywords. Not loading the script.',
+	'Mod "%s": Failed to load "%s" as scripts have been disabled.',
+	'Mod "%s": Script "%s" contains one or more blocked keywords.',
+	'Mod "%s": Scene at "%s" contains one or more built-in scripts utilizing "func _init" override. For security reasons, this is not allowed.',
 ]
 
 const warning_strings:Array[String] = [

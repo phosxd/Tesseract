@@ -12,11 +12,6 @@ const api_version:int = 1
 const resource_extensions:Array[String] = [
 	# Standard resource.
 	'tres','res',
-	# Audio.
-	'wav',
-	'mp3',
-	'ogg',
-	'flac',
 	# Scene.
 	'tscn',
 	'scn',
@@ -36,6 +31,7 @@ const resource_extensions:Array[String] = [
 	'shape',
 	'json',
 ]
+const audio_extensions:Array[String] = ['wav','mp3','ogg','flac']
 const image_extensions:Array[String] = ['svg','png','jpg','jpeg']
 
 ## Signals available to mods.
@@ -224,7 +220,7 @@ func _is_script_compliant(mod_id:String, script:Script, blocked_keywords:Array, 
 		for keyword in blocked_keywords:
 			if keyword is not String: continue
 			if keyword in source_code:
-				if emit_error && not file_path.is_empty(): TesseractErrorServer.error.emit(7, [mod_id,file_path])
+				if emit_error && not file_path.is_empty(): TesseractErrorServer.error.emit(8, [mod_id,file_path])
 				return false
 	return true
 
@@ -241,9 +237,11 @@ func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod
 		if res is Script:
 			_load_mod_script(mod_instance, relative_path, res, res_path, file_path, cfg)
 		elif res is PackedScene:
-			_load_mod_scene(mod_instance, relative_path, res, res_path, file_path)
+			_load_mod_scene(mod_instance, relative_path, res, res_path, file_path, cfg)
 		elif res:
 			_load_mod_resource(mod_instance, relative_path, res, res_path)
+	elif ext in audio_extensions:
+		_load_mod_audio(mod_instance, relative_path, res_path, file_path, ext)
 	# Load image.
 	elif ext in image_extensions:
 		var res = Image.load_from_file(file_path)
@@ -261,6 +259,26 @@ func _load_mod_resource(mod_instance:TesseractMod, relative_path:String, res:Res
 	if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
 
 
+func _load_mod_audio(mod_instance:TesseractMod, relative_path:String, res_path:String, file_path:String, ext:String) -> void:
+	var res
+	match ext:
+		'wav':
+			res = AudioStreamWAV.load_from_file(file_path)
+		'mp3':
+			res = AudioStreamMP3.load_from_file(file_path)
+		'ogg':
+			res = AudioStreamOggVorbis.load_from_file(file_path)
+		# For use with AudioStreamFLAC module.
+		'flac':
+			var class_exists = ClassDB.class_exists('AudioStreamFLAC')
+			if class_exists:
+				res = ClassDB.class_call_static('AudioStreamFLAC', 'new')
+				res.data = FileAccess.get_file_as_bytes(file_path)
+	if not res: return
+	res.take_over_path(res_path)
+	if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
+
+
 func _load_mod_script(mod_instance:TesseractMod, relative_path:String, res:Script, res_path:String, file_path:String, cfg:Dictionary) -> void:
 	if not cfg.allow_mod_scripts: return
 	if not _is_script_compliant(mod_instance.id, res, cfg.blocked_script_keywords, true, file_path): return
@@ -268,11 +286,23 @@ func _load_mod_script(mod_instance:TesseractMod, relative_path:String, res:Scrip
 	if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
 
 
-func _load_mod_scene(mod_instance:TesseractMod, relative_path:String, res:PackedScene, res_path:String, file_path:String) -> void:
+func _load_mod_scene(mod_instance:TesseractMod, relative_path:String, res:PackedScene, res_path:String, file_path:String, cfg:Dictionary) -> void:
+	var scene_string:String = var_to_str(res)
+	if not cfg.allow_mod_scripts && scene_string.contains('Object(GDScript'):
+		TesseractErrorServer.error.emit(7, [mod_instance.id,file_path])
+		return
+	if scene_string.contains('func _init'):
+		TesseractErrorServer.error.emit(9, [mod_instance.id,file_path])
+		return
+
 	var scene_instance:Node = res.instantiate()
 
 	# Apply mod id to asset linker nodes.
 	for node in scene_instance.find_children('*'):
+		var script = node.get_script()
+		if script is Script && script.resource_path.contains('::'):
+			var end = '::'+script.resource_path.split('::')[1]
+			if not _is_script_compliant(mod_instance.id, script, cfg.blocked_script_keywords, true, file_path): return
 		if node is not AssetLinker: continue
 		node = node as AssetLinker
 		node.mod_id = mod_instance.id
