@@ -94,6 +94,13 @@ var allow_mod_scripts: bool:
 	get():
 		return config.get_value('game', 'allow_mod_scripts', true)
 
+var blocked_script_keywords: Array:
+	set(value):
+		blocked_script_keywords = value
+		config.set_value('game', 'blocked_script_keywords', value)
+	get():
+		return config.get_value('game', 'blocked_script_keywords', [])
+
 #endregion
 
 var config_loaded:bool = false
@@ -150,12 +157,12 @@ func load_mods() -> void:
 			var mod_config := ConfigFile.new()
 			var mod_config_err:Error = mod_config.load(mod_config_path)
 			if mod_config_err != OK:
-				TesseractErrorServer.warning.emit(1, [mod_path])
+				TesseractErrorServer.error.emit(2, [mod_path])
 				if not allow_mods_without_details: continue
 			# Check ID is valid.
 			var id = mod_config.get_value('TesseractMod', 'id', '')
 			if id is not String or id.is_empty() or id in mod_instances:
-				TesseractErrorServer.warning.emit(4, [mod_path])
+				TesseractErrorServer.error.emit(3, [mod_path])
 				continue
 			# Check mod dependencies are loaded.
 			var mod_dependencies = mod_config.get_value('TesseractMod', 'mod_dependencies', [])
@@ -163,7 +170,7 @@ func load_mods() -> void:
 				for depedency in mod_dependencies:
 					if depedency is not String: continue
 					if depedency not in mod_instances:
-						TesseractErrorServer.error.emit(2, [mod_path,depedency])
+						TesseractErrorServer.error.emit(4, [id,depedency])
 
 			# Get game configuration for mods of this type.
 			var mod_type:String = mod_config.get_value('TesseractMod', 'type', '')
@@ -172,14 +179,15 @@ func load_mods() -> void:
 			var cfg_game_api_version = config.get_value(mod_type_section, 'api_version', game_api_version)
 			var cfg_load_into_path:String = config.get_value(mod_type_section, 'load_mods_into_path', load_mods_into_path)
 			var cfg_allow_mod_scripts:bool = config.get_value(mod_type_section, 'allow_mod_scripts', allow_mod_scripts)
+			var cfg_blocked_script_keywords:Array = config.get_value(mod_type_section, 'blocked_script_keywords', blocked_script_keywords)
 			# Check version compatibility.
 			var for_game_versions:Array[Variant] = mod_config.get_value('TesseractMod', 'for_game_versions', [cfg_game_api_version])
 			var for_tesseract_versions:Array[Variant] = mod_config.get_value('TesseractMod', 'for_tesseract_versions', [api_version])
 			if cfg_game_api_version not in for_game_versions:
-				TesseractErrorServer.warning.emit(2, [mod_path])
+				TesseractErrorServer.error.emit(5, [id])
 				continue
 			if api_version not in for_tesseract_versions :
-				TesseractErrorServer.warning.emit(3, [mod_path])
+				TesseractErrorServer.error.emit(6, [id])
 				continue
 
 			# Get mod script.
@@ -187,6 +195,7 @@ func load_mods() -> void:
 			var mod_script
 			if cfg_allow_mod_scripts && FileAccess.file_exists(mod_script_path):
 				mod_script = load(mod_script_path) as GDScript
+				if not _is_script_compliant(id, mod_script, cfg_blocked_script_keywords): mod_script = null
 			# If none found or is invalid, use backup script.
 			if mod_script is not GDScript or mod_script.get_base_script() != TesseractMod:
 				mod_script = load('res://addons/tesseract/ModScript.gd')
@@ -202,10 +211,22 @@ func load_mods() -> void:
 			TesseractUtils.walk_dir(mod_path, _load_into_mod.bind(mod_path, mod_instance, {
 				'load_into_path': cfg_load_into_path,
 				'allow_mod_scripts': cfg_allow_mod_scripts,
+				'blocked_script_keywords': cfg_blocked_script_keywords,
 			},''))
 			# Initialize mod.
 			mod_instance.init()
 			mod_instances.set(mod_instance.id, mod_instance)
+
+
+func _is_script_compliant(mod_id:String, script:Script, blocked_keywords:Array, emit_error:bool=false, file_path:String='') -> bool:
+	var source_code = script.source_code
+	if not blocked_keywords.is_empty():
+		for keyword in blocked_keywords:
+			if keyword is not String: continue
+			if keyword in source_code:
+				if emit_error && not file_path.is_empty(): TesseractErrorServer.error.emit(7, [mod_id,file_path])
+				return false
+	return true
 
 
 func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod, cfg:Dictionary, requested_by:String='') -> void:
@@ -217,8 +238,9 @@ func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod
 	# Load resource.
 	if ext in resource_extensions:
 		var res = load(file_path)
-		if res is Script && not cfg.allow_mod_scripts: return
-		if res is PackedScene:
+		if res is Script:
+			_load_mod_script(mod_instance, relative_path, res, res_path, file_path, cfg)
+		elif res is PackedScene:
 			_load_mod_scene(mod_instance, relative_path, res, res_path, file_path)
 		elif res:
 			_load_mod_resource(mod_instance, relative_path, res, res_path)
@@ -235,6 +257,13 @@ func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod
 
 
 func _load_mod_resource(mod_instance:TesseractMod, relative_path:String, res:Resource, res_path:String) -> void:
+	res.take_over_path(res_path)
+	if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
+
+
+func _load_mod_script(mod_instance:TesseractMod, relative_path:String, res:Script, res_path:String, file_path:String, cfg:Dictionary) -> void:
+	if not cfg.allow_mod_scripts: return
+	if not _is_script_compliant(mod_instance.id, res, cfg.blocked_script_keywords, true, file_path): return
 	res.take_over_path(res_path)
 	if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
 

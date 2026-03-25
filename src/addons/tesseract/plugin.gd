@@ -3,7 +3,7 @@ extends EditorPlugin
 
 const singleton_names:Array[String] = ['TesseractAPI', 'TesseractErrorServer']
 const singleton_paths:Array[String] = ['res://addons/tesseract/API.gd', 'res://addons/tesseract/ErrorServer.gd']
-var tab_instance: Control
+#var tab_instance: Control
 
 
 func _enable_plugin() -> void:
@@ -31,23 +31,26 @@ func _disable_plugin() -> void:
 
 
 func _enter_tree() -> void:
-	tab_instance = preload('res://addons/tesseract/Editor/main.tscn').instantiate()
-	tab_instance.hide()
-	EditorInterface.get_editor_main_screen().add_child(tab_instance)
+	pass
+	#tab_instance = preload('res://addons/tesseract/Editor/main.tscn').instantiate()
+	#tab_instance.hide()
+	#EditorInterface.get_editor_main_screen().add_child(tab_instance)
 
 
 func _exit_tree() -> void:
-	if tab_instance:
-		tab_instance.queue_free()
+	pass
+	#if tab_instance:
+		#tab_instance.queue_free()
 
 
 func _make_visible(visible:bool) -> void:
-	if tab_instance:
-		tab_instance.visible = visible
+	pass
+	#if tab_instance:
+		#tab_instance.visible = visible
 
 
 func _has_main_screen() -> bool:
-	return true
+	return false
 
 
 func _get_plugin_name():

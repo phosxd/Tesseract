@@ -4,15 +4,16 @@ extends Node
 const error_strings:Array[String] = [
 	'%s',
 	'Failed to load game config.',
-	'Mod at "%s" is missing depedency "%s". Ensure the dependency is loaded before this mod.',
+	'Mod at "%s": Missing config file, unable to get details',
+	'Mod at "%s": Invalid or overlapping ID. Make sure the mod\'s ID is not the same as another mod.',
+	'Mod "%s": Missing depedency "%s", ensure the dependency is loaded before this mod.',
+	'Mod "%s": Not compatible with game\'s API version.',
+	'Mod "%s": Not compatible with the current version of Tesseract.',
+	'Mod "%s": Script "%s" contains one or more blocked keywords. Not loading the script.',
 ]
 
 const warning_strings:Array[String] = [
 	'%s',
-	'Mod at "%s" is missing config file, unable to get details.',
-	'Mod at "%s" is not compatible with game\'s API version.',
-	'Mod at "%s" is not compatible with the current version of Tesseract.',
-	'Mod at "%s" has an invalid or overlapping ID. Make sure the mod\'s ID is not the same as another mod.',
 ]
 
 const info_strings:Array[String] = [
