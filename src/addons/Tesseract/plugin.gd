@@ -2,7 +2,7 @@
 extends EditorPlugin
 
 const singleton_names:Array[String] = ['TesseractAPI', 'TesseractErrorServer']
-const singleton_paths:Array[String] = ['res://addons/tesseract/API.gd', 'res://addons/tesseract/ErrorServer.gd']
+const singleton_paths:Array[String] = ['res://addons/Tesseract/API.gd', 'res://addons/Tesseract/ErrorServer.gd']
 #var tab_instance: Control
 
 
@@ -58,4 +58,4 @@ func _get_plugin_name():
 
 
 func _get_plugin_icon() -> Texture2D:
-	return preload('res://addons/tesseract/icon.svg')
+	return preload('res://addons/Tesseract/icon.svg')

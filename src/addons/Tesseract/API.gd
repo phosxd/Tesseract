@@ -105,7 +105,7 @@ var mod_instances:Dictionary[String,TesseractMod] = {}
 
 
 func _init() -> void:
-	var err:Error = config.load('res://addons/tesseract/plugin.cfg')
+	var err:Error = config.load('res://addons/Tesseract/plugin.cfg')
 	if err != OK:
 		return
 	config_loaded = true
@@ -113,7 +113,6 @@ func _init() -> void:
 
 func _ready() -> void:
 	if not config_loaded:
-		print("YTUHUIh")
 		TesseractErrorServer.error.emit(1)
 
 
@@ -194,7 +193,7 @@ func load_mods() -> void:
 				if not _is_script_compliant(id, mod_script, cfg_blocked_script_keywords): mod_script = null
 			# If none found or is invalid, use backup script.
 			if mod_script is not GDScript or mod_script.get_base_script() != TesseractMod:
-				mod_script = load('res://addons/tesseract/ModScript.gd')
+				mod_script = load('res://addons/Tesseract/ModScript.gd')
 			var mod_instance = mod_script.new() as TesseractMod
 
 			# Set config values to the mod instance.

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c75l60rldx6wy"]
 
-[ext_resource type="Script" uid="uid://54hah8qtvily" path="res://addons/tesseract/Nodes/SceneMerger.gd" id="1_6oqqb"]
-[ext_resource type="Script" uid="uid://b46movjli0m6g" path="res://addons/tesseract/Nodes/AssetLinker.gd" id="2_pn4g5"]
+[ext_resource type="Script" uid="uid://54hah8qtvily" path="res://addons/Tesseract/Nodes/SceneMerger.gd" id="1_6oqqb"]
+[ext_resource type="Script" uid="uid://b46movjli0m6g" path="res://addons/Tesseract/Nodes/AssetLinker.gd" id="2_pn4g5"]
 
 [node name="Main" type="Node" unique_id=1385759991 node_paths=PackedStringArray("included_nodes")]
 script = ExtResource("1_6oqqb")
