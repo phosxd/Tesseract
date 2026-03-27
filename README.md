@@ -14,6 +14,7 @@ Tesseract is a (work in progress) advanced modding platform for Godot 4 that giv
 - [Features](#features)
   - [Load from PCK, ZIP, & folder](load-from-pck-zip-folder)
   - [No unnecessary bundling](#no-unnecessary-bundling)
+  - [Runtime unloading](#runtime-unloading)
   - [Extensive sandboxing](#extensive-sandboxing)
   - [Detailed metadata](#detailed-metadata)
 - [Plugin setup (games)](#plugin-setup-games)
@@ -33,6 +34,10 @@ Loading from folder is my favorite way for quick testing, you just drag the fold
 ## No unnecessary bundling
 Unlike with PCKs, Tesseract mods don't have to bundle in every asset it uses from the base game, you can just use it & as long as it stays available in the base game you have nothing to worry about.
 Although if you'd like, you can still bundle game assets into your mod, but beware it will overwrite the base game's original file.
+
+## Runtime unloading
+Tesseract allows you to unload individual mods to restore original resources in the virtual file system.
+However, unloading has a few edge cases where the resources continue to be referenced well after unloading due to how the merging system works. To enure everything works smoothly it is recommended to unload ALL mods then reload the mods you want to keep loaded, although if you aren't experiencing issues it is fine to unload individual mods without reloading all the other mods.
 
 ## Extensive sandboxing
 The most powerful aspect of Tesseract has got to be it's sandboxing capabilities. Game developers can specify "mod types" each with their own set of permissions, any mod that specifies a mod type will inherit it's permissions.
