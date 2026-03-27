@@ -4,7 +4,7 @@
 
 **Version:** 0.0.1
 
-Tesseract is a (work in progress) advanced modding platform for Godot 4 that gives both modders & game developers the tools they need to easily implement seamless mods.
+Tesseract is a modding platform for Godot 4.6 that gives both modders & game developers the tools they need to easily implement seamless mods.
 
 </div>
 
@@ -15,6 +15,7 @@ Tesseract is a (work in progress) advanced modding platform for Godot 4 that giv
   - [Load from PCK, ZIP, & folder](load-from-pck-zip-folder)
   - [No unnecessary bundling](#no-unnecessary-bundling)
   - [Runtime unloading](#runtime-unloading)
+  - [Browse mod files & directories](#browse-mod-files-directories)
   - [Extensive sandboxing](#extensive-sandboxing)
   - [Detailed metadata](#detailed-metadata)
 - [Plugin setup (games)](#plugin-setup-games)
@@ -39,10 +40,14 @@ Although if you'd like, you can still bundle game assets into your mod, but bewa
 Tesseract allows you to unload individual mods to restore original resources in the virtual file system.
 However, unloading has a few edge cases where the resources continue to be referenced well after unloading due to how the merging system works. To enure everything works smoothly it is recommended to unload ALL mods then reload the mods you want to keep loaded, although if you aren't experiencing issues it is fine to unload individual mods without reloading all the other mods.
 
+## Browse mod files & directories
+Godot PCKs just merge into the virtual file system with no easy way to get the specific files or directories added or changed.
+To address this, Tesseract implements convenient methods for getting all directories & file paths a specific mod has contributed.
+
 ## Extensive sandboxing
 The most powerful aspect of Tesseract has got to be it's sandboxing capabilities. Game developers can specify "mod types" each with their own set of permissions, any mod that specifies a mod type will inherit it's permissions.
 
-With Tesseract, game developers can choose where in the virtual filesystem mod files are loaded into, regulate / block script usage, & choose which files mods are allowed to overwrite.
+Game developers can choose where in the virtual file system mod files are loaded into, regulate / block script usage, & choose which files mods are allowed to overwrite.
 
 By "regulate script usage" I mean you can either outright block all use of built-in & external scripts, or you can add blocked keywords which while not a full solution does help deter mallicious actors.
 
