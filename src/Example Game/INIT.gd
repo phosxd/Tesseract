@@ -4,7 +4,7 @@ func _init() -> void:
 	TesseractErrorServer.info.connect(_on_tes_info)
 	TesseractErrorServer.warning.connect(_on_tes_warning)
 	TesseractErrorServer.error.connect(_on_tes_error)
-	
+
 	TesseractAPI.load_mods()
 	for mod:TesseractMod in TesseractAPI.mod_instances.values():
 		print('Mod successfuly added: '+mod.name)

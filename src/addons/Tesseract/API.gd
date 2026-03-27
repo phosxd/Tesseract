@@ -1,10 +1,8 @@
-## Bridge between your game & mods.
+## Main interface between your game & Tesseract.
 ##
-## This is where you can set options for your game to determine how mods will interact with it.
-##
-## Set [param game_api_version] to distinguish between major API versions (E.g. if you changed signal map, asset map or your project file structure).
-## Set [param asset_map] to provide assets that mods can use.
-## Set [param signal_map] to provide signals that mods can call.
+## Call [param load_mods] to load all mods at once, or you can call [param load_mod] to load mods individually.
+##[br]
+##[br]Set [param signal_map] to provide signals that mods can call.
 extends Node
 
 ## Tesseract API version.
@@ -102,6 +100,8 @@ var blocked_script_keywords: Array:
 var config_loaded:bool = false
 ## Every loaded mod instance.
 var mod_instances:Dictionary[String,TesseractMod] = {}
+var _resource_trace:Array[Dictionary] = []
+var _can_trace_resources:bool = true
 
 
 func _init() -> void:
@@ -122,6 +122,7 @@ func init(options:Dictionary[String,Variant]) -> void:
 		set(key, options[key])
 
 
+## Load all mods & PCK patches.
 func load_mods() -> void:
 	# Get PCK patch paths.
 	if not patches_path.is_empty():
@@ -147,70 +148,75 @@ func load_mods() -> void:
 		# Load mods in alphabetical order.
 		mod_paths.sort()
 		for mod_path:String in mod_paths:
-			# Get mod config.
-			var mod_config_path:String = mod_path+'/MOD.cfg'
-			var mod_config := ConfigFile.new()
-			var mod_config_err:Error = mod_config.load(mod_config_path)
-			if mod_config_err != OK:
-				TesseractErrorServer.error.emit(2, [mod_path])
-				if not allow_mods_without_details: continue
-			# Check ID is valid.
-			var id = mod_config.get_value('TesseractMod', 'id', '')
-			if id is not String or id.is_empty() or id in mod_instances:
-				TesseractErrorServer.error.emit(3, [mod_path])
-				continue
-			# Check mod dependencies are loaded.
-			var mod_dependencies = mod_config.get_value('TesseractMod', 'mod_dependencies', [])
-			if mod_dependencies is Array && not mod_dependencies.is_empty():
-				for depedency in mod_dependencies:
-					if depedency is not String: continue
-					if depedency not in mod_instances:
-						TesseractErrorServer.error.emit(4, [id,depedency])
+			load_mod(mod_path)
 
-			# Get game configuration for mods of this type.
-			var mod_type:String = mod_config.get_value('TesseractMod', 'type', '')
-			var mod_type_section:String = 'MOD TYPE: %s' % mod_type
 
-			var cfg_game_api_version = config.get_value(mod_type_section, 'api_version', game_api_version)
-			var cfg_load_into_path:String = config.get_value(mod_type_section, 'load_mods_into_path', load_mods_into_path)
-			var cfg_allow_mod_scripts:bool = config.get_value(mod_type_section, 'allow_mod_scripts', allow_mod_scripts)
-			var cfg_blocked_script_keywords:Array = config.get_value(mod_type_section, 'blocked_script_keywords', blocked_script_keywords)
-			# Check version compatibility.
-			var for_game_versions:Array[Variant] = mod_config.get_value('TesseractMod', 'for_game_versions', [cfg_game_api_version])
-			var for_tesseract_versions:Array[Variant] = mod_config.get_value('TesseractMod', 'for_tesseract_versions', [api_version])
-			if cfg_game_api_version not in for_game_versions:
-				TesseractErrorServer.error.emit(5, [id])
-				continue
-			if api_version not in for_tesseract_versions :
-				TesseractErrorServer.error.emit(6, [id])
-				continue
+## Load a mod from the [param path].
+func load_mod(path:String) -> void:
+	# Get mod config.
+	var mod_config_path:String = path+'/MOD.cfg'
+	var mod_config := ConfigFile.new()
+	var mod_config_err:Error = mod_config.load(mod_config_path)
+	if mod_config_err != OK:
+		TesseractErrorServer.error.emit(2, [path])
+		if not allow_mods_without_details: return
+	# Check ID is valid.
+	var id = mod_config.get_value('TesseractMod', 'id', '')
+	if id is not String or id.is_empty() or id in mod_instances:
+		TesseractErrorServer.error.emit(3, [path])
+		return
+	# Check mod dependencies are loaded.
+	var mod_dependencies = mod_config.get_value('TesseractMod', 'mod_dependencies', [])
+	if mod_dependencies is Array && not mod_dependencies.is_empty():
+		for depedency in mod_dependencies:
+			if depedency is not String: continue
+			if depedency not in mod_instances:
+				TesseractErrorServer.error.emit(4, [id,depedency])
 
-			# Get mod script.
-			var mod_script_path:String = mod_path+'/INIT.gd'
-			var mod_script
-			if cfg_allow_mod_scripts && FileAccess.file_exists(mod_script_path):
-				mod_script = load(mod_script_path) as GDScript
-				if not _is_script_compliant(id, mod_script, cfg_blocked_script_keywords): mod_script = null
-			# If none found or is invalid, use backup script.
-			if mod_script is not GDScript or mod_script.get_base_script() != TesseractMod:
-				mod_script = load('res://addons/Tesseract/ModScript.gd')
-			var mod_instance = mod_script.new() as TesseractMod
+	# Get game configuration for mods of this type.
+	var mod_type:String = mod_config.get_value('TesseractMod', 'type', '')
+	var mod_type_section:String = 'MOD TYPE: %s' % mod_type
 
-			# Set config values to the mod instance.
-			mod_instance.config = mod_config
-			for key:String in mod_config.get_section_keys('TesseractMod'):
-				mod_instance.set(key, mod_config.get_value('TesseractMod', key))
+	var cfg_game_api_version = config.get_value(mod_type_section, 'api_version', game_api_version)
+	var cfg_load_into_path:String = config.get_value(mod_type_section, 'load_mods_into_path', load_mods_into_path)
+	var cfg_allow_mod_scripts:bool = config.get_value(mod_type_section, 'allow_mod_scripts', allow_mod_scripts)
+	var cfg_blocked_script_keywords:Array = config.get_value(mod_type_section, 'blocked_script_keywords', blocked_script_keywords)
+	# Check version compatibility.
+	var for_game_versions:Array[Variant] = mod_config.get_value('TesseractMod', 'for_game_versions', [cfg_game_api_version])
+	var for_tesseract_versions:Array[Variant] = mod_config.get_value('TesseractMod', 'for_tesseract_versions', [api_version])
+	if cfg_game_api_version not in for_game_versions:
+		TesseractErrorServer.error.emit(5, [id])
+		return
+	if api_version not in for_tesseract_versions :
+		TesseractErrorServer.error.emit(6, [id])
+		return
 
-			# Walk through all resources in the mod & load them.
-			var resources:Array[Resource] = []
-			TesseractUtils.walk_dir(mod_path, _load_into_mod.bind(mod_path, mod_instance, {
-				'load_into_path': cfg_load_into_path,
-				'allow_mod_scripts': cfg_allow_mod_scripts,
-				'blocked_script_keywords': cfg_blocked_script_keywords,
-			},''))
-			# Initialize mod.
-			mod_instance.init()
-			mod_instances.set(mod_instance.id, mod_instance)
+	# Get mod script.
+	var mod_script_path:String = path+'/INIT.gd'
+	var mod_script
+	if cfg_allow_mod_scripts && FileAccess.file_exists(mod_script_path):
+		mod_script = load(mod_script_path) as GDScript
+		if not _is_script_compliant(id, mod_script, cfg_blocked_script_keywords): mod_script = null
+	# If none found or is invalid, use backup script.
+	if mod_script is not GDScript or mod_script.get_base_script() != TesseractMod:
+		mod_script = load('res://addons/Tesseract/ModScript.gd')
+	var mod_instance = mod_script.new() as TesseractMod
+
+	# Set config values to the mod instance.
+	mod_instance.config = mod_config
+	for key:String in mod_config.get_section_keys('TesseractMod'):
+		mod_instance.set(key, mod_config.get_value('TesseractMod', key))
+
+	# Walk through all resources in the mod & load them.
+	var resources:Array[Resource] = []
+	TesseractUtils.walk_dir(path, _load_into_mod.bind(path, mod_instance, {
+		'load_into_path': cfg_load_into_path,
+		'allow_mod_scripts': cfg_allow_mod_scripts,
+		'blocked_script_keywords': cfg_blocked_script_keywords,
+	},''))
+	# Initialize mod.
+	mod_instance.init()
+	mod_instances.set(mod_instance.id, mod_instance)
 
 
 func _is_script_compliant(mod_id:String, script:Script, blocked_keywords:Array, emit_error:bool=false, file_path:String='') -> bool:
@@ -239,14 +245,14 @@ func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod
 			_load_mod_scene(mod_instance, relative_path, res, res_path, file_path, cfg)
 		elif res:
 			_load_mod_resource(mod_instance, relative_path, res, res_path)
+	# Load audio.
 	elif ext in audio_extensions:
 		_load_mod_audio(mod_instance, relative_path, res_path, file_path, ext)
 	# Load image.
 	elif ext in image_extensions:
 		var res = Image.load_from_file(file_path)
 		if res:
-			res.take_over_path(res_path)
-			if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
+			mod_instance.add_resource(relative_path, res_path, res)
 	# Load config.
 	elif ext in ['cfg']:
 		var res = ConfigFile.new()
@@ -254,8 +260,7 @@ func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod
 
 
 func _load_mod_resource(mod_instance:TesseractMod, relative_path:String, res:Resource, res_path:String) -> void:
-	res.take_over_path(res_path)
-	if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
+	mod_instance.add_resource(relative_path, res_path, res)
 
 
 func _load_mod_audio(mod_instance:TesseractMod, relative_path:String, res_path:String, file_path:String, ext:String) -> void:
@@ -274,15 +279,13 @@ func _load_mod_audio(mod_instance:TesseractMod, relative_path:String, res_path:S
 				res = ClassDB.class_call_static('AudioStreamFLAC', 'new')
 				res.data = FileAccess.get_file_as_bytes(file_path)
 	if not res: return
-	res.take_over_path(res_path)
-	if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
+	mod_instance.add_resource(relative_path, res_path, res)
 
 
 func _load_mod_script(mod_instance:TesseractMod, relative_path:String, res:Script, res_path:String, file_path:String, cfg:Dictionary) -> void:
 	if not cfg.allow_mod_scripts: return
 	if not _is_script_compliant(mod_instance.id, res, cfg.blocked_script_keywords, true, file_path): return
-	res.take_over_path(res_path)
-	if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
+	mod_instance.add_resource(relative_path, res_path, res)
 
 
 func _load_mod_scene(mod_instance:TesseractMod, relative_path:String, res:PackedScene, res_path:String, file_path:String, cfg:Dictionary) -> void:
@@ -350,27 +353,26 @@ func _load_mod_scene(mod_instance:TesseractMod, relative_path:String, res:Packed
 		# Pack the merged scene.
 		res.pack(base_scene_instance)
 
-	res.take_over_path(res_path)
-	if not mod_instance.resources.values().has(res): mod_instance.resources.set(relative_path, res)
+	mod_instance.add_resource(relative_path, res_path, res)
 
 
 func _load_mod_cfg(mod_instance:TesseractMod, relative_path:String, res:ConfigFile, res_path:String, file_path:String) -> void:
 	var res_err:Error = res.load(file_path)
 	if res_err != OK: return
-	if not res.has_section('SceneVariables'): return
+	var parent_path:String = res_path.trim_suffix('.cfg')
 
-	var scene_path:String = res_path.trim_suffix('.cfg')
-	mod_instance.scene_variables.set(scene_path, {})
-	for key:String in res.get_section_keys('SceneVariables'):
-		mod_instance.scene_variables[scene_path].set(key, res.get_value('SceneVariables',key))
-	var scene = load(scene_path)
-	if scene is PackedScene:
-		var variable_setter := SceneVariableSetter.new()
-		variable_setter.name = 'SceneVariableSetter'
-		variable_setter.mod_instance_id = mod_instance.id
-		var scene_instance:Node = scene.instantiate()
-		scene_instance.add_child(variable_setter)
-		variable_setter.owner = scene_instance
-		scene.pack(scene_instance)
-		scene.take_over_path(scene_path)
-		if not mod_instance.resources.values().has(scene): mod_instance.resources.set(relative_path, scene)
+	if res.has_section('SceneVariables'):
+		mod_instance.scene_variables.set(parent_path, {})
+		for key:String in res.get_section_keys('SceneVariables'):
+			mod_instance.scene_variables[parent_path].set(key, res.get_value('SceneVariables',key))
+
+		var scene = load(parent_path)
+		if scene is PackedScene:
+			var variable_setter := SceneVariableSetter.new()
+			variable_setter.name = 'SceneVariableSetter'
+			variable_setter.mod_id = mod_instance.id
+			var scene_instance:Node = scene.instantiate()
+			scene_instance.add_child(variable_setter)
+			variable_setter.owner = scene_instance
+			scene.pack(scene_instance)
+			mod_instance.add_resource(relative_path, parent_path, scene)

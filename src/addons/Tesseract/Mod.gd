@@ -36,17 +36,68 @@ var resources:Dictionary[String,Resource] = {}
 @abstract func recieve_signal(signal_name:String, ...args) -> void
 
 
-## Send a signal to the game.
-func send_signal(name:String, ...args) -> Error:
-	var sig = TesseractAPI.signal_map.get(name)
-	if not sig:
-		return ERR_DOES_NOT_EXIST
-	sig = sig as Signal
+## Releases all resources from the virtual filesystem, replaced by the next mod or the original resource.
+## [br]
+## [br]There is an issue that causes resources referenced in a scene to not get unloaded, even when the scene is loaded well after the resource has been removed.
+## For this to happen 3 conditions must be met:
+## [br]- This mod includes a resource that is referened in a scene.
+## [br]- Another mod loaded after this mod modifies the scene containing the resource reference.
+## [br]- The other mod does not get unloaded.
+## [br]Keep this in mind when trying to unload a mod. For unloading to always work flawlessly 100% of the time, ALL mods should be unloaded, then reload the mods you want to keep.
+## [br]
+## [br]If [param also_free] is true, will delete the mod instance after unloading.
+func unload(also_free:bool=false) -> void:
+	for trace:Dictionary in TesseractAPI._resource_trace.duplicate():
+		if trace.get('id') == id:
+			var path = trace.get('path')
+			TesseractAPI._resource_trace.erase(trace)
+			# Get previous trace.
+			var previous_trace_index:int = TesseractAPI._resource_trace.rfind_custom(func(item:Dictionary) -> bool:
+				if item.get('path', ' ') == path:
+					return item.get('res') is Resource
+				return false
+			)
+			# If previous trace exists, replace with previous trace's resource.
+			if previous_trace_index != -1:
+				var previous_trace:Dictionary = TesseractAPI._resource_trace[previous_trace_index]
+				var res = previous_trace.get('res')
+				if res is Resource: res.take_over_path(path)
 
-	sig.emit.callv(args)
+	if also_free:
+		free.call_deferred()
 
-	return OK
 
+## Adds a resource to the mod & loads it into the virtual file system.
+func add_resource(relative_path:String, resource_path:String, resource:Resource) -> void:
+	# If original resource not already stored in trace, add it.
+	if TesseractAPI._can_trace_resources && ResourceLoader.exists(resource_path):
+		var original_resource_trace_index:int = TesseractAPI._resource_trace.find_custom(func(item:Dictionary) -> bool:
+			if item.get('id') != '@game': return false
+			return item.get('path') == resource_path
+		)
+		if original_resource_trace_index == -1:
+			var original_resource = load(resource_path)
+			if original_resource:
+				TesseractAPI._resource_trace.insert(0, {
+					'id': '@game',
+					'path': resource_path,
+					'res': original_resource,
+				})
+
+	if not resources.values().has(resource):
+		# Add to resource map & resource trace.
+		resources.set(relative_path, resource)
+		if TesseractAPI._can_trace_resources:
+			TesseractAPI._resource_trace.append({
+				'id': id,
+				'path': resource_path,
+				'res': resource,
+			})
+		# Take over path in virtual file system.
+		resource.take_over_path(resource_path)
+
+
+#region file system
 
 ## Returns all directories from this mod.
 func get_directories() -> PackedStringArray:
@@ -81,3 +132,17 @@ func get_files_at(path:String) -> PackedStringArray:
 		if not dir.is_empty() && not dir.contains('/') && dir not in result: result.append(dir)
 
 	return result
+
+#endregion
+
+
+## Send a signal to the game.
+func send_signal(name:String, ...args) -> Error:
+	var sig = TesseractAPI.signal_map.get(name)
+	if not sig:
+		return ERR_DOES_NOT_EXIST
+	sig = sig as Signal
+
+	sig.emit.callv(args)
+
+	return OK

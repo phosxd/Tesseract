@@ -20,16 +20,11 @@ func reset() -> void:
 
 
 func _ready() -> void:
-	if Engine.is_editor_hint(): return
 	%Background.color = background_color
 	%'Player 1'.get_node('Color').color = player_1_color
 	%'Player 2'.get_node('Color').color = player_2_color
 	%Ball.color = ball_color
 	reset()
-
-
-func _process(_delta:float) -> void:
-	pass
 
 
 func _on_ball_body_entered(body:Node2D) -> void:
