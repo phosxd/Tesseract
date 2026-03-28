@@ -168,10 +168,11 @@ func load_mod(path:String) -> void:
 	# Check mod dependencies are loaded.
 	var mod_dependencies = mod_config.get_value('TesseractMod', 'mod_dependencies', [])
 	if mod_dependencies is Array && not mod_dependencies.is_empty():
-		for depedency in mod_dependencies:
-			if depedency is not String: continue
-			if depedency not in mod_instances:
-				TesseractErrorServer.error.emit(4, [id,depedency])
+		for dependency in mod_dependencies:
+			if dependency is not String: continue
+			if dependency not in mod_instances:
+				TesseractErrorServer.error.emit(4, [id,dependency])
+				return
 
 	# Get game configuration for mods of this type.
 	var mod_type:String = mod_config.get_value('TesseractMod', 'type', '')
@@ -203,6 +204,7 @@ func load_mod(path:String) -> void:
 	var mod_instance = mod_script.new() as TesseractMod
 
 	# Set config values to the mod instance.
+	mod_instance.mod_dependencies = mod_dependencies
 	mod_instance.config = mod_config
 	for key:String in mod_config.get_section_keys('TesseractMod'):
 		mod_instance.set(key, mod_config.get_value('TesseractMod', key))

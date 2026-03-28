@@ -28,7 +28,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/tesseract/plugin.cfg")
+enabled=PackedStringArray("res://addons/Tesseract/plugin.cfg")
 
 [file_customization]
 

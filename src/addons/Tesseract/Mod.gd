@@ -11,20 +11,21 @@ var id: String
 var name: String
 ## Mod author. Optional.
 var author: String
-
+## Short description of the mod. Optional.
+var description_short: String
+## Long description of the mod. Optional.
+var description_long: String
 ## Display string for the mod version.
 var version_string:String = '1.0.0'
+
 ## The mod version.
 var version_number:int = 1
 ## The game version(s) this mod was made for.
 var for_game_versions:Array[int] = [1]
 ## The Tesseract version(s) this mod was made for.
 var for_tesseract_verions:Array[int] = [1]
-
-## Short description of the mod. Optional.
-var description_short: String
-## Long description of the mod. Optional.
-var description_long: String
+## Mod IDs this mod requires to work.
+var mod_dependencies := PackedStringArray()
 
 ## All resources loaded from this mod & their paths relative to the mod's root directory.
 var resources:Dictionary[String,Resource] = {}
