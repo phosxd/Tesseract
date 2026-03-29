@@ -12,7 +12,7 @@ Tesseract is a modding platform for Godot 4.6 that gives both modders & game dev
 
 # Table of contents
 - [Features](#features)
-  - [Load from ZIP or folder](load-from-zip-or-folder)
+  - [Load from ZIP or folder](#load-from-zip-or-folder)
   - [No unnecessary bundling](#no-unnecessary-bundling)
   - [Runtime unloading](#runtime-unloading)
   - [Browse mod files & directories](#browse-mod-files-&-directories)
@@ -29,7 +29,13 @@ Tesseract is a modding platform for Godot 4.6 that gives both modders & game dev
 Tesseract can load mods from ZIP (or TMOD) files, as well as straight from a folder containing all the mod's content.
 
 Loading from folder is my favorite way for quick testing, you just drag the folder sraight from your Godot project then into the game's designated mods folder, no exporting, no packing, it's simple.
-The only reasons you would want to ZIP the mod are if you want to easily distribute the mod as a single file or if you want to compress the mod so it leaves a smaller footprint.
+
+### ZIP Pros:
+- Comressable size. Not very helpful for small mods though.
+- Easier to transfer & share as it is a singular file.
+### ZIP Cons:
+- Harder to modify directly.
+- Takes extra time to unpack & read. This can make a noticeable difference loading 10+ zipped mods versus 10+ unzipped mods.
 
 ## No unnecessary bundling
 Unlike with PCKs, Tesseract mods don't have to bundle in every asset it uses from the base game, you can just use it & as long as it stays available in the base game you have nothing to worry about.

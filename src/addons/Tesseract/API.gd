@@ -7,6 +7,7 @@ extends Node
 
 ## Tesseract API version.
 const api_version:int = 1
+const tmod_extensions:Array[String] = ['zip','tmod']
 const resource_extensions:Array[String] = [
 	# Standard resource.
 	'tres','res',
@@ -32,6 +33,8 @@ const resource_extensions:Array[String] = [
 const audio_extensions:Array[String] = ['wav','mp3','ogg','flac']
 const image_extensions:Array[String] = ['svg','png','jpg','jpeg']
 
+## Whether or not ZIP reading is supported.
+var zip_supported:bool = ClassDB.class_exists('ZIPReader')
 ## Signals available to mods.
 var signal_map:Dictionary[String,Signal] = {}
 
@@ -98,8 +101,10 @@ var blocked_script_keywords: Array:
 #endregion
 
 var config_loaded:bool = false
+
 ## Every loaded mod instance.
 var mod_instances:Dictionary[String,TesseractMod] = {}
+## An ordered list of all mod resources for correct unloading.
 var _resource_trace:Array[Dictionary] = []
 var _can_trace_resources:bool = true
 
@@ -144,10 +149,39 @@ func load_mods() -> void:
 		if not DirAccess.dir_exists_absolute(mods_path): DirAccess.make_dir_recursive_absolute(mods_path)
 		for dir_path:String in DirAccess.get_directories_at(mods_path):
 			mod_paths.append(mods_path+'/'+dir_path)
+		for file_path:String in DirAccess.get_files_at(mods_path):
+			if file_path.get_extension().to_lower() in tmod_extensions:
+				mod_paths.append(mods_path+'/'+file_path)
 
 		# Load mods in alphabetical order.
 		mod_paths.sort()
 		for mod_path:String in mod_paths:
+			# If path is a file, unpack ZIP & change mod path to temp directory.
+			var temp_dir
+			if not mod_path.get_extension().is_empty() && zip_supported:
+				var reader := ZIPReader.new()
+				var err:int = reader.open(mod_path)
+				if err != OK:
+					TesseractErrorServer.error.emit(10, [mod_path])
+					continue
+				# Create temp directory.
+				temp_dir = DirAccess.create_temp('TMOD-%s' % mod_path.get_file().split('.')[0])
+				if not temp_dir:
+					TesseractErrorServer.error.emit(11, [mod_path])
+					continue
+				var temp_path:String = temp_dir.get_current_dir()
+				# Read all files in ZIP & write to temp directory.
+				for file_path:String in reader.get_files():
+					if file_path.ends_with('/'): continue
+					DirAccess.make_dir_recursive_absolute((temp_path+'/'+file_path).get_base_dir())
+					var file := FileAccess.open(temp_path+'/'+file_path, FileAccess.WRITE)
+					if not file:
+						TesseractErrorServer.error.emit(12, [mod_path,file_path,error_string(FileAccess.get_open_error())])
+						continue
+					file.store_buffer(reader.read_file(file_path))
+					file.close()
+				mod_path = temp_path
+			# Load mod.
 			load_mod(mod_path)
 
 
@@ -237,7 +271,7 @@ func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod
 	if relative_path in ['INIT.gd','MOD.cfg']: return
 	if relative_path in mod_instance.resources: return
 	var res_path:String = 'res://'+cfg.load_into_path+('' if cfg.load_into_path.ends_with('/') or cfg.load_into_path.is_empty() else '/')+'%s' % relative_path
-	var ext:String = file_path.split('.')[-1]
+	var ext:String = file_path.get_extension()
 	# Load resource.
 	if ext in resource_extensions:
 		var res = load(file_path)
