@@ -352,8 +352,10 @@ func _load_mod_scene(mod_instance:TesseractMod, relative_path:String, res:Packed
 			node.get_parent().remove_child(node)
 			node.queue_free()
 
-		# Pack the merged scene.
+		# Pack the merged scene then delete the instances.
 		res.pack(base_scene_instance)
+		scene_instance.queue_free()
+		base_scene_instance.queue_free()
 
 	mod_instance.add_resource(relative_path, res_path, res)
 
@@ -376,5 +378,9 @@ func _load_mod_cfg(mod_instance:TesseractMod, relative_path:String, res:ConfigFi
 			var scene_instance:Node = scene.instantiate()
 			scene_instance.add_child(variable_setter)
 			variable_setter.owner = scene_instance
+
+			# Pack the scene then delete the instance.
 			scene.pack(scene_instance)
+			scene_instance.queue_free()
+
 			mod_instance.add_resource(relative_path, parent_path, scene)
