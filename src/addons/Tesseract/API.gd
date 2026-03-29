@@ -127,7 +127,7 @@ func load_mods() -> void:
 	# Get PCK patch paths.
 	if not patches_path.is_empty():
 		var pck_paths := PackedStringArray()
-		if not DirAccess.dir_exists_absolute(mods_path): DirAccess.make_dir_recursive_absolute(patches_path)
+		if not DirAccess.dir_exists_absolute(patches_path): DirAccess.make_dir_recursive_absolute(patches_path)
 		TesseractUtils.walk_dir(patches_path, func(file_path:String) -> void:
 			pck_paths.append(file_path)
 		)
@@ -235,7 +235,7 @@ func _is_script_compliant(mod_id:String, script:Script, blocked_keywords:Array, 
 func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod, cfg:Dictionary, requested_by:String='') -> void:
 	var relative_path:String = file_path.trim_prefix(mod_path+'/')
 	if relative_path in ['INIT.gd','MOD.cfg']: return
-	if relative_path in mod_instance.resources.keys(): return
+	if relative_path in mod_instance.resources: return
 	var res_path:String = 'res://'+cfg.load_into_path+('' if cfg.load_into_path.ends_with('/') or cfg.load_into_path.is_empty() else '/')+'%s' % relative_path
 	var ext:String = file_path.split('.')[-1]
 	# Load resource.
