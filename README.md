@@ -12,25 +12,24 @@ Tesseract is a modding platform for Godot 4.6 that gives both modders & game dev
 
 # Table of contents
 - [Features](#features)
-  - [Load from PCK, ZIP, & folder](load-from-pck-zip-folder)
+  - [Load from ZIP or folder](load-from-zip-or-folder)
   - [No unnecessary bundling](#no-unnecessary-bundling)
   - [Runtime unloading](#runtime-unloading)
-  - [Browse mod files & directories](#browse-mod-files-directories)
+  - [Browse mod files & directories](#browse-mod-files-&-directories)
   - [Extensive sandboxing](#extensive-sandboxing)
   - [Detailed metadata](#detailed-metadata)
 - [Plugin setup (games)](#plugin-setup-games)
 - [Plugin setup (mods)](#plugin-setup-mods)
-- [Install & use mods](#install-use-mods)
+- [Install & use mods](#install-&-use-mods)
 - [Create a basic mod](#create-a-basic-mod)
 - [A guide on creating moddable games](#a-guide-on-creating-moddable-games)
 
 # Features
-## Load from PCK, ZIP, & folder
-Tesseract can load mods from PCK files, ZIP (or TMOD) files, as well as straight from a folder.
-
-Zipped & folder mods are fully featured & an utilize Tesseract to it's full potetial. However PCKs are Godot's built-in solution which doesn't support metadata, sandboxing, or entry point scripts which being larger due to dependency bundling.
+## Load from ZIP or folder
+Tesseract can load mods from ZIP (or TMOD) files, as well as straight from a folder containing all the mod's content.
 
 Loading from folder is my favorite way for quick testing, you just drag the folder sraight from your Godot project then into the game's designated mods folder, no exporting, no packing, it's simple.
+The only reasons you would want to ZIP the mod are if you want to easily distribute the mod as a single file or if you want to compress the mod so it leaves a smaller footprint.
 
 ## No unnecessary bundling
 Unlike with PCKs, Tesseract mods don't have to bundle in every asset it uses from the base game, you can just use it & as long as it stays available in the base game you have nothing to worry about.
@@ -42,12 +41,11 @@ However, unloading has a few edge cases where the resources continue to be refer
 
 ## Browse mod files & directories
 Godot PCKs just merge into the virtual file system with no easy way to get the specific files or directories added or changed.
-To address this, Tesseract implements convenient methods for getting all directories & file paths a specific mod has contributed.
+To address this, Tesseract implements convenient methods for getting all directories & file paths any specific mod has contributed.
 
 ## Extensive sandboxing
-The most powerful aspect of Tesseract has got to be it's sandboxing capabilities. Game developers can specify "mod types" each with their own set of permissions, any mod that specifies a mod type will inherit it's permissions.
-
-Game developers can choose where in the virtual file system mod files are loaded into, regulate / block script usage, & choose which files mods are allowed to overwrite.
+Game developers can specify "mod types" each with their own set of permissions, any mod that specifies a mod type will inherit it's permissions.
+They can also choose where in the virtual file system mod files are loaded into, regulate / block script usage, & choose which files mods are allowed to overwrite.
 
 By "regulate script usage" I mean you can either outright block all use of built-in & external scripts, or you can add blocked keywords which while not a full solution does help deter mallicious actors.
 
