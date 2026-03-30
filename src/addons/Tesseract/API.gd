@@ -129,31 +129,31 @@ func init(options:Dictionary[String,Variant]) -> void:
 
 ## Load all mods & PCK patches.
 func load_mods() -> void:
-	# Get PCK patch paths.
-	if not patches_path.is_empty():
-		var pck_paths := PackedStringArray()
-		if not DirAccess.dir_exists_absolute(patches_path): DirAccess.make_dir_recursive_absolute(patches_path)
-		TesseractUtils.walk_dir(patches_path, func(file_path:String) -> void:
-			pck_paths.append(file_path)
-		)
-		# Load PCK mods in alphabetical order.
-		pck_paths.sort()
-		for path:String in pck_paths:
-			var succeeded:bool = ProjectSettings.load_resource_pack(path, true)
-			if not succeeded:
-				continue
+	var mod_path_map:Dictionary[String,PackedStringArray] = {}
 
-	# Get mod paths.
-	if not mods_path.is_empty():
-		var mod_paths := PackedStringArray()
-		if not DirAccess.dir_exists_absolute(mods_path): DirAccess.make_dir_recursive_absolute(mods_path)
-		for dir_path:String in DirAccess.get_directories_at(mods_path):
-			mod_paths.append(mods_path+'/'+dir_path)
-		for file_path:String in DirAccess.get_files_at(mods_path):
-			if file_path.get_extension().to_lower() in tmod_extensions:
-				mod_paths.append(mods_path+'/'+file_path)
+	# Get mod paths & types.
+	var sections := ['MOD TYPE: '] + Array(config.get_sections())
+	sections.sort_custom(func(a,b) -> bool:
+		return config.get_value(a, 'priority', 0) < config.get_value(b, 'priority', 0)
+	)
+	for section:String in sections:
+		if not section.begins_with('MOD TYPE: '): continue
+		var type:String = section.replace('MOD TYPE: ','')
+		mod_path_map.set(type, PackedStringArray())
+		var load_from_path:String = config.get_value(section, 'load_from_path', mods_path)
+		if not load_from_path.is_empty():
+			if not DirAccess.dir_exists_absolute(load_from_path):
+				if load_from_path.begins_with('res://'): continue
+				DirAccess.make_dir_recursive_absolute(load_from_path)
+			for dir_path:String in DirAccess.get_directories_at(load_from_path):
+				mod_path_map[type].append(load_from_path+'/'+dir_path)
+			for file_path:String in DirAccess.get_files_at(load_from_path):
+				if file_path.get_extension().to_lower() in tmod_extensions:
+					mod_path_map[type].append(load_from_path+'/'+file_path)
 
-		# Load mods in alphabetical order.
+	# Load mods in alphabetical order.
+	for type:String in mod_path_map:
+		var mod_paths:PackedStringArray = mod_path_map[type]
 		mod_paths.sort()
 		for mod_path:String in mod_paths:
 			# If path is a file, unpack ZIP & change mod path to temp directory.
@@ -182,11 +182,11 @@ func load_mods() -> void:
 					file.close()
 				mod_path = temp_path
 			# Load mod.
-			load_mod(mod_path)
+			load_mod(mod_path, type)
 
 
 ## Load a mod from the [param path].
-func load_mod(path:String) -> void:
+func load_mod(path:String, expected_type:String) -> void:
 	# Get mod config.
 	var mod_config_path:String = path+'/MOD.cfg'
 	var mod_config := ConfigFile.new()
@@ -210,6 +210,9 @@ func load_mod(path:String) -> void:
 
 	# Get game configuration for mods of this type.
 	var mod_type:String = mod_config.get_value('TesseractMod', 'type', '')
+	if mod_type != expected_type:
+		TesseractErrorServer.error.emit(13, [id,mod_type,path.get_base_dir()])
+		return
 	var mod_type_section:String = 'MOD TYPE: %s' % mod_type
 
 	var cfg_game_api_version = config.get_value(mod_type_section, 'api_version', game_api_version)
