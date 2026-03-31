@@ -50,18 +50,10 @@ var game_api_version: Variant:
 	get():
 		return config.get_value('game', 'api_version')
 
-## Path to load PCKs from. If is an empty string, PCK loading is disabled.
-var patches_path: String:
-	set(value):
-		patches_path = value
-		config.set_value('game', 'patches_path', value)
-	get():
-		return config.get_value('game', 'patches_path', '')
-
 ## Path to load mods from. If is an empty string, Tesseract mod loading is disabled.
 var mods_path: String:
 	set(value):
-		patches_path = value
+		mods_path = value
 		config.set_value('game', 'mods_path', value)
 	get():
 		return config.get_value('game', 'mods_path', '')
