@@ -159,6 +159,13 @@ To properly reference assets in your modded scenes, use the `AssetLinker` node.
 
 There is not anything else to say here, the rest is up to the game itself to document.
 
+## Export
+Tesseract lets you export your mod directly from the Godot editor, just right click the folder holding the mod then select the "Export TMOD" option near the bottom. The option will only show up for folders containing a valid mod.
+
+Selecting the "Export TMODT" option will open a file save dialog menu where you can choose where to save the zipped mod.
+
+Exported mods do not include UID files or any editor specific files that will not be used in the actual mod.
+
 # A guide on creating moddable games
 Slapping on a mod manager to your game doesn't automatically make it easily moddable. Here are some general rules you should follow to ensure a straight forward experience for modders.
 

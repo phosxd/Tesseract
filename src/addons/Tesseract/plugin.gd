@@ -1,9 +1,11 @@
 @tool
 extends EditorPlugin
 
+const icon:Texture2D = preload('res://addons/Tesseract/icon.svg')
 const singleton_names:Array[String] = ['TesseractAPI', 'TesseractErrorServer']
 const singleton_paths:Array[String] = ['res://addons/Tesseract/API.gd', 'res://addons/Tesseract/ErrorServer.gd']
-#var tab_instance: Control
+const filesystem_context_menu:GDScript = preload('res://addons/Tesseract/Editor/FileSystemContextMenu.gd')
+var filesystem_context_menu_instance:EditorContextMenuPlugin = filesystem_context_menu.new(icon)
 
 
 func _enable_plugin() -> void:
@@ -26,27 +28,19 @@ func _enable_plugin() -> void:
 
 
 func _disable_plugin() -> void:
+	# Remove autoloads.
 	for i:int in singleton_names.size():
 		remove_autoload_singleton(singleton_names[i])
 
 
 func _enter_tree() -> void:
-	pass
-	#tab_instance = preload('res://addons/tesseract/Editor/main.tscn').instantiate()
-	#tab_instance.hide()
-	#EditorInterface.get_editor_main_screen().add_child(tab_instance)
+	# Add plugins.
+	add_context_menu_plugin(EditorContextMenuPlugin.CONTEXT_SLOT_FILESYSTEM, filesystem_context_menu_instance)
 
 
 func _exit_tree() -> void:
-	pass
-	#if tab_instance:
-		#tab_instance.queue_free()
-
-
-func _make_visible(visible:bool) -> void:
-	pass
-	#if tab_instance:
-		#tab_instance.visible = visible
+	# Remove plugins.
+	remove_context_menu_plugin(filesystem_context_menu_instance)
 
 
 func _has_main_screen() -> bool:
@@ -58,4 +52,4 @@ func _get_plugin_name():
 
 
 func _get_plugin_icon() -> Texture2D:
-	return preload('res://addons/Tesseract/icon.svg')
+	return icon
