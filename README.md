@@ -180,3 +180,8 @@ Not only will separating things help with reusability, organization, & modificat
 
 ## Provide documentation for modders
 Modders don't just know your project's file structure & APIs off the top of their head, you need to provide them with that knowledge, **especially if your game is closed source**.
+
+# Games with Tesseract mod support
+Here is a list of all games released that are using Tesseract for mod support!
+
+Open a pull request or issue to request the addition of your game.

@@ -27,3 +27,5 @@ func _ready() -> void:
 			asset = mod.resources.get(mod_asset_path)
 
 	if asset != null: node.set(node_property, asset)
+
+	queue_free()
