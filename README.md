@@ -14,6 +14,7 @@ Tesseract is a modding platform for Godot 4.6 that gives both modders & game dev
 - [Features](#features)
   - [Load from ZIP or folder](#load-from-zip-or-folder)
   - [No unnecessary bundling](#no-unnecessary-bundling)
+  - [Editor integration](#editor-integration)
   - [Runtime unloading](#runtime-unloading)
   - [Browse mod files & directories](#browse-mod-files--directories)
   - [Extensive sandboxing](#extensive-sandboxing)
@@ -23,6 +24,7 @@ Tesseract is a modding platform for Godot 4.6 that gives both modders & game dev
 - [Install & use mods](#install-&-use-mods)
 - [Create a basic mod](#create-a-basic-mod)
 - [A guide on creating moddable games](#a-guide-on-creating-moddable-games)
+- [Games with Tesseract support](#games-with-tesseract-support)
 
 # Features
 ## Load from ZIP or folder
@@ -40,6 +42,12 @@ Loading from folder is my favorite way for quick testing, you just drag the fold
 ## No unnecessary bundling
 Unlike with PCKs, Tesseract mods don't have to bundle in every asset it uses from the base game, you can just use it & as long as it stays available in the base game you have nothing to worry about.
 Although if you'd like, you can still bundle game assets into your mod, but beware it will overwrite the base game's original file.
+
+## Editor integration
+Tesseract has multiple in-editor tools to help you out.
+
+- "Export TMOD" file system context menu option. Packs & exports the selected mod as a ZIP file.
+- "Create new Mod" file system context menu option. Automatically creates a fresh mod directory with all the required files added.
 
 ## Runtime unloading
 Tesseract allows you to unload individual mods to restore original resources in the virtual file system.
@@ -181,7 +189,7 @@ Not only will separating things help with reusability, organization, & modificat
 ## Provide documentation for modders
 Modders don't just know your project's file structure & APIs off the top of their head, you need to provide them with that knowledge, **especially if your game is closed source**.
 
-# Games with Tesseract mod support
-Here is a list of all games released that are using Tesseract for mod support!
+# Games with Tesseract support
+Here is a list of all games released that are using Tesseract for modding support!
 
 Open a pull request or issue to request the addition of your game.

@@ -11,10 +11,10 @@ func _popup_menu(paths:PackedStringArray) -> void:
 	if paths.size() != 1: return
 	var path:String = paths[0]
 	if not path.ends_with('/'): return
-	# Check directory contains a config file.
-	if not FileAccess.file_exists(path+'MOD.cfg'): return
 
-	add_context_menu_item('Export TMOD', export_tmod.bind(path), icon)
+	# If directory is a mod, show mod options.
+	if FileAccess.file_exists(path+'MOD.cfg'):
+		add_context_menu_item('Export TMOD', export_tmod.bind(path), icon)
 
 
 func export_tmod(paths:PackedStringArray, mod_dir:String) -> void:

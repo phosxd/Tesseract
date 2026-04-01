@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://b5vcdym8idw5x"]
+
+[ext_resource type="Script" uid="uid://cqj83tk7bxtp6" path="res://addons/Tesseract/Editor/Create Mod Dialog/create_mod_dialog.gd" id="1_d4p0n"]
+
+[node name="CreateModDialog" type="Window" unique_id=107625122]
+oversampling_override = 1.0
+initial_position = 2
+size = Vector2i(600, 400)
+script = ExtResource("1_d4p0n")
+
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=825723098]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Scroll" unique_id=59685635]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="Scroll/VBox" unique_id=1639638772]
+layout_mode = 2
+text = "Create new Tesseract mod"
+horizontal_alignment = 1
+
+[node name="Sep 1" type="HSeparator" parent="Scroll/VBox" unique_id=917941652]
+layout_mode = 2
+
+[node name="ID" type="HBoxContainer" parent="Scroll/VBox" unique_id=183170267]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Scroll/VBox/ID" unique_id=1951111028]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ID"
+
+[node name="ID" type="LineEdit" parent="Scroll/VBox/ID" unique_id=1812156172]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "My Mod by John Doe"
+
+[node name="Name" type="HBoxContainer" parent="Scroll/VBox" unique_id=1307512520]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Scroll/VBox/Name" unique_id=1694473218]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Name"
+
+[node name="Name" type="LineEdit" parent="Scroll/VBox/Name" unique_id=714290479]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "My Mod"
+
+[node name="Author" type="HBoxContainer" parent="Scroll/VBox" unique_id=1847082006]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Scroll/VBox/Author" unique_id=1531235554]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Author"
+
+[node name="Author" type="LineEdit" parent="Scroll/VBox/Author" unique_id=1122539411]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "John Doe"
+
+[node name="Include Init" type="HBoxContainer" parent="Scroll/VBox" unique_id=1873445430]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Scroll/VBox/Include Init" unique_id=1464348730]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Include INIT script?"
+
+[node name="Include Init" type="CheckButton" parent="Scroll/VBox/Include Init" unique_id=652882433]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Options" type="HBoxContainer" parent="Scroll/VBox" unique_id=1317953796]
+layout_mode = 2
+size_flags_vertical = 10
+
+[node name="Submit" type="Button" parent="Scroll/VBox/Options" unique_id=996839363]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Submit"
+
+[node name="Cancel" type="Button" parent="Scroll/VBox/Options" unique_id=342697190]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Cancel"
+
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="pressed" from="Scroll/VBox/Options/Submit" to="." method="_on_submit_pressed"]
+[connection signal="pressed" from="Scroll/VBox/Options/Cancel" to="." method="_on_cancel_pressed"]

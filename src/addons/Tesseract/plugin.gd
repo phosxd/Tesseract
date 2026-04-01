@@ -5,7 +5,9 @@ const icon:Texture2D = preload('res://addons/Tesseract/icon.svg')
 const singleton_names:Array[String] = ['TesseractAPI', 'TesseractErrorServer']
 const singleton_paths:Array[String] = ['res://addons/Tesseract/API.gd', 'res://addons/Tesseract/ErrorServer.gd']
 const filesystem_context_menu:GDScript = preload('res://addons/Tesseract/Editor/FileSystemContextMenu.gd')
+const create_context_menu:GDScript = preload('res://addons/Tesseract/Editor/CreateContextMenu.gd')
 var filesystem_context_menu_instance:EditorContextMenuPlugin = filesystem_context_menu.new(icon)
+var create_context_menu_instance:EditorContextMenuPlugin = create_context_menu.new(icon)
 
 
 func _enable_plugin() -> void:
@@ -36,11 +38,13 @@ func _disable_plugin() -> void:
 func _enter_tree() -> void:
 	# Add plugins.
 	add_context_menu_plugin(EditorContextMenuPlugin.CONTEXT_SLOT_FILESYSTEM, filesystem_context_menu_instance)
+	add_context_menu_plugin(EditorContextMenuPlugin.CONTEXT_SLOT_FILESYSTEM_CREATE, create_context_menu_instance)
 
 
 func _exit_tree() -> void:
 	# Remove plugins.
 	remove_context_menu_plugin(filesystem_context_menu_instance)
+	remove_context_menu_plugin(create_context_menu_instance)
 
 
 func _has_main_screen() -> bool:
