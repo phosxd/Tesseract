@@ -15,7 +15,7 @@ Tesseract is a modding platform for Godot 4.6 that gives both modders & game dev
   - [Load from ZIP or folder](#load-from-zip-or-folder)
   - [No unnecessary bundling](#no-unnecessary-bundling)
   - [Runtime unloading](#runtime-unloading)
-  - [Browse mod files & directories](#browse-mod-files-&-directories)
+  - [Browse mod files & directories](#browse-mod-files--directories)
   - [Extensive sandboxing](#extensive-sandboxing)
   - [Detailed metadata](#detailed-metadata)
 - [Plugin setup (games)](#plugin-setup-games)
