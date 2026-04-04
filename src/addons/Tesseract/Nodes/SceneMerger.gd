@@ -11,10 +11,5 @@ class_name SceneMerger extends Node
 @export var remove_node_paths:Array[String]
 
 
-func merge(scene_instance:Node) -> void:
-	for node:Node in included_nodes:
-		print(node.get_path_to(self))
-
-
 func _on_include_all_nodes_pressed() -> void:
 	included_nodes = find_children('*')

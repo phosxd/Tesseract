@@ -162,17 +162,33 @@ func load_mods() -> void:
 					TesseractErrorServer.error.emit(11, [mod_path])
 					continue
 				var temp_path:String = temp_dir.get_current_dir()
+
+				# Check if all files share the same top-most directory.
+				var has_common_directory:bool = true
+				var common_directory: String
+				var i:int = 0
+				for file_path:String in reader.get_files():
+					if i == 0:
+						common_directory = file_path.split('/',false)[0]
+					if file_path.split('/')[0] != common_directory:
+						has_common_directory = false
+						break
+					i += 1
+
 				# Read all files in ZIP & write to temp directory.
 				for file_path:String in reader.get_files():
 					if file_path.ends_with('/'): continue
+					var og_file_path:String = file_path
+					if has_common_directory: file_path = file_path.trim_prefix(common_directory+'/')
 					DirAccess.make_dir_recursive_absolute((temp_path+'/'+file_path).get_base_dir())
 					var file := FileAccess.open(temp_path+'/'+file_path, FileAccess.WRITE)
 					if not file:
 						TesseractErrorServer.error.emit(12, [mod_path,file_path,error_string(FileAccess.get_open_error())])
 						continue
-					file.store_buffer(reader.read_file(file_path))
+					file.store_buffer(reader.read_file(og_file_path))
 					file.close()
 				mod_path = temp_path
+
 			# Load mod.
 			load_mod(mod_path, type)
 
