@@ -6,7 +6,7 @@ var mod_config := ConfigFile.new()
 
 
 func _on_submit_pressed() -> void:
-	mod_config.load('res://addons/Tesseract/Editor/Create Mod Dialog/Template MOD.cfg')
+	mod_config.load('res://addons/Tesseract/Templates/ModConfig.cfg')
 
 	var mod_id:String = %ID.text
 	var mod_name:String = %Name.text.replace('/','')
@@ -27,7 +27,7 @@ func _on_submit_pressed() -> void:
 
 	if include_init:
 		var init_file := FileAccess.open(mod_dir+'/INIT.gd', FileAccess.WRITE)
-		init_file.store_string(FileAccess.get_file_as_string('res://addons/Tesseract/Editor/Create Mod Dialog/Template INIT.gd'))
+		init_file.store_string(FileAccess.get_file_as_string('res://addons/Tesseract/Templates/ModInit.gd'))
 		init_file.close()
 
 	queue_free()

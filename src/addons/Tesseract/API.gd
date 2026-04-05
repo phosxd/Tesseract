@@ -245,7 +245,7 @@ func load_mod(path:String, expected_type:String) -> void:
 		if not _is_script_compliant(id, mod_script, cfg_blocked_script_keywords): mod_script = null
 	# If none found or is invalid, use backup script.
 	if mod_script is not GDScript or mod_script.get_base_script() != TesseractMod:
-		mod_script = load('res://addons/Tesseract/ModScript.gd')
+		mod_script = load('res://addons/Tesseract/Templates/ModInit.gd')
 	var mod_instance = mod_script.new() as TesseractMod
 
 	# Set config values to the mod instance.

@@ -85,8 +85,8 @@ Mods can provide any additional metadata fields they want.
 # Plugin setup (games)
 There is a slight setup process you need to go through before mods can work for your game & before developers can start modding your game.
 
-1. Edit `addons/tesseract/plugin.cfg` to your liking. You can change how & where mods are loaded among many other things.
-2. Add plugin config file `addons/tesseract/plugin.cfg` to export includes. This will allow the plugin to work after export.
+1. Edit `addons/Tesseract/plugin.cfg` to your liking. You can change how & where mods are loaded among many other things.
+2. Add plugin config file `addons/Tesseract/plugin.cfg` to export includes. This will allow the plugin to work after export.
    <img src="./git_assets/export_includes.png" align=""></img>
 
 
@@ -170,7 +170,7 @@ There is not anything else to say here, the rest is up to the game itself to doc
 ## Export
 Tesseract lets you export your mod directly from the Godot editor, just right click the folder holding the mod then select the "Export TMOD" option near the bottom. The option will only show up for folders containing a valid mod.
 
-Selecting the "Export TMODT" option will open a file save dialog menu where you can choose where to save the zipped mod.
+Selecting the "Export TMOD" option will open a file save dialog menu where you can choose where to save the zipped mod.
 
 Exported mods do not include UID files or any editor specific files that will not be used in the actual mod.
 
