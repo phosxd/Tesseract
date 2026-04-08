@@ -254,13 +254,18 @@ func load_mod(path:String, expected_type:String) -> void:
 	for key:String in mod_config.get_section_keys('TesseractMod'):
 		mod_instance.set(key, mod_config.get_value('TesseractMod', key))
 
-	# Walk through all resources in the mod & load them.
-	var resources:Array[Resource] = []
-	TesseractUtils.walk_dir(path, _load_into_mod.bind(path, mod_instance, {
+	var cfg:Dictionary[String,Variant] = {
 		'load_into_path': cfg_load_into_path,
 		'allow_mod_scripts': cfg_allow_mod_scripts,
 		'blocked_script_keywords': cfg_blocked_script_keywords,
-	},''))
+	}
+
+	# Iterate through priority resources & load them first.
+	for relative_path:String in mod_instance.priority_paths:
+		_load_into_mod(path+'/'+relative_path, path, mod_instance, cfg, '')
+	# Walk through all resources in the mod & load them.
+	TesseractUtils.walk_dir(path, _load_into_mod.bind(path, mod_instance, cfg, ''))
+
 	# Initialize mod.
 	mod_instance.init()
 	mod_instances.set(mod_instance.id, mod_instance)
@@ -345,16 +350,6 @@ func _load_mod_scene(mod_instance:TesseractMod, relative_path:String, res:Packed
 		return
 
 	var scene_instance:Node = res.instantiate()
-
-	# Apply mod id to asset linker nodes.
-	for node in scene_instance.find_children('*'):
-		var script = node.get_script()
-		if script is Script && script.resource_path.contains('::'):
-			var end = '::'+script.resource_path.split('::')[1]
-			if not _is_script_compliant(mod_instance.id, script, cfg.blocked_script_keywords, true, file_path): return
-		if node is not AssetLinker: continue
-		node = node as AssetLinker
-		node.mod_id = mod_instance.id
 
 	# Merge scenes.
 	if scene_instance is SceneMerger:

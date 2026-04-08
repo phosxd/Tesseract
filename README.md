@@ -19,6 +19,9 @@ Tesseract is a modding platform for Godot 4.6 that gives both modders & game dev
   - [Browse mod files & directories](#browse-mod-files--directories)
   - [Extensive sandboxing](#extensive-sandboxing)
   - [Detailed metadata](#detailed-metadata)
+- [Downsides](#downsides)
+  - [No import configuration](#no-import-configuration)
+  - [No resource remaping](#no-resource-remaping)
 - [Plugin setup (games)](#plugin-setup-games)
 - [Plugin setup (mods)](#plugin-setup-mods)
 - [Install & use mods](#install-&-use-mods)
@@ -70,16 +73,25 @@ Mods are not required to specify all possible metadata values, just the bare min
 Here is a list of all built-in metadata fields:
 - *id: String
 - *version_number: int
-- *for_game_versions: Array[Variant]
-- *for_tesseract_versions: Array[int]
+- *for_game_versions: Array\[Variant\]
+- *for_tesseract_versions: Array\[int\]
 - name: String
 - author: String
 - version_string: String
 - description_short: String
 - description_long: String
-- mod_dependencies: Array[String]
+- mod_dependencies: Array\[String\]
+- real_path: String
+- priority_paths: Array\[String\]
 
 Mods can provide any additional metadata fields they want.
+
+
+# Downsides
+## No import configuration
+Usually you'll find `.import` files next to assets like images & audio files. These files can be exported into a mod but they will not be used. Import config files tell Godot how it should import an asset & what changes it should make before integrating it. At the moment Godot does expose any API to parse & apply import config files, luckily they are raw text `ini` styled files so reading them is very straight-forward, however applying changes to the resource is not.
+
+This might be implemented sooner or later, it all depends on the demand from myself or others.
 
 
 # Plugin setup (games)
@@ -117,7 +129,7 @@ Here is what a basic config file looks like:
 [TesseractMod]
 ; Unique mod identifier. This should be somethig highly unlikely to be used in other mods.
 ; Prefixing the ID with the author name is a good way of differentiating mods with the same name.
-id="John Doe's Mod'"
+id="My Mod by John Doe"
 ; Mod display name.
 name="My Mod"
 ; Author of the mod.
@@ -132,9 +144,20 @@ for_game_versions=[1]
 for_tesseract_versions=[1]
 description_short="Short description of this mod."
 description_long="Long description of this mod, should include a list of all changes made."
-
 ; Optional. Mod IDs that must be present & loaded before this mod.
 mod_dependencies=["Other Mod 1", "Other Mod 2"]
+
+; The path being used for development. To get this path right click on the root directory of the mod & select "Copy Path".
+; This will be used to map resource paths for use inside of this mod.
+; It is VERY important that this path is accurate, does not conflict with other mods, & does not conflict with of the game's paths either.
+real_path="res://Example Mods/My Mod by John Doe"
+; Resources that will be loaded before everything else. Use this to define load order.
+; Paths should be relative to the mod root directory.
+priority_paths=[
+  "Assets/example.gd",
+  "Assets/example.tscn",
+  ; Example: script needs to be loaded before the scene.
+]
 ```
 
 Your config file should be located in the *root directory of your mod* & have the exact name `MOD.cfg`.
@@ -162,8 +185,7 @@ Your script file should be located in the *root directory of your mod* & have th
 Files in your mod are directly imported into the virtual file system of the game, this means things can be overwritten & can break if you aren't careful (given that the game is very permissive of mods).
 Always follow the game's documentation for locations to put your mod files.
 
-Also, never referene any resources created inside your mod! For example, don't use a texture from your mod inside a scene, the reference will be to the one inside the project, not the mod.
-To properly reference assets in your modded scenes, use the `AssetLinker` node.
+Referencing resources from inside your mod (I.E a scene relying on a script only present inside your mod) is fine & will work so long as you have correctly set the mod's `real_path` config value & it is not overlapping with any other paths that may be present in other mods or in the game.
 
 There is not anything else to say here, the rest is up to the game itself to document.
 

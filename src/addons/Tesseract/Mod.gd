@@ -26,6 +26,10 @@ var for_game_versions:Array[int] = [1]
 var for_tesseract_verions:Array[int] = [1]
 ## Mod IDs this mod requires to work.
 var mod_dependencies := PackedStringArray()
+## The mod's development path.
+var real_path: String
+## Resources to load before all others.
+var priority_paths := PackedStringArray()
 
 ## All resources loaded from this mod & their paths relative to the mod's root directory.
 var resources:Dictionary[String,Resource] = {}
@@ -65,11 +69,16 @@ func unload(also_free:bool=false) -> void:
 				if res is Resource: res.take_over_path(path)
 
 	if also_free:
-		free.call_deferred()
+		self.free.call_deferred()
 
 
 ## Adds a resource to the mod & loads it into the virtual file system.
 func add_resource(relative_path:String, resource_path:String, resource:Resource) -> void:
+	if not real_path.is_empty(): _add_resource('@MOD:'+relative_path, real_path+relative_path, resource.duplicate())
+	_add_resource(relative_path, resource_path, resource)
+
+
+func _add_resource(relative_path:String, resource_path:String, resource:Resource) -> void:
 	# If original resource not already stored in trace, add it.
 	if TesseractAPI._can_trace_resources && ResourceLoader.exists(resource_path):
 		var original_resource_trace_index:int = TesseractAPI._resource_trace.find_custom(func(item:Dictionary) -> bool:
