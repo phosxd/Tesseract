@@ -2,9 +2,9 @@
 
 <img src="./git_assets/icon.png" align=""></img>
 
-**Version:** 0.0.1
+**Version:** 1.0.0
 
-Tesseract is a modding platform for Godot 4.6 that gives both modders & game developers the tools they need to easily implement seamless mods.
+Tesseract is a mod loader for Godot 4.6 that gives both modders & game developers the tools they need to easily implement seamless mods.
 
 </div>
 
@@ -21,7 +21,6 @@ Tesseract is a modding platform for Godot 4.6 that gives both modders & game dev
   - [Detailed metadata](#detailed-metadata)
 - [Downsides](#downsides)
   - [No import configuration](#no-import-configuration)
-  - [No resource remaping](#no-resource-remaping)
 - [Plugin setup (games)](#plugin-setup-games)
 - [Plugin setup (mods)](#plugin-setup-mods)
 - [Install & use mods](#install-&-use-mods)
@@ -150,6 +149,7 @@ mod_dependencies=["Other Mod 1", "Other Mod 2"]
 ; The path being used for development. To get this path right click on the root directory of the mod & select "Copy Path".
 ; This will be used to map resource paths for use inside of this mod.
 ; It is VERY important that this path is accurate, does not conflict with other mods, & does not conflict with of the game's paths either.
+; Set this path to empty if you do not reference any mod resources in your mod.
 real_path="res://Example Mods/My Mod by John Doe"
 ; Resources that will be loaded before everything else. Use this to define load order.
 ; Paths should be relative to the mod root directory.

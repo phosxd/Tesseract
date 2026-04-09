@@ -19,6 +19,7 @@ const error_strings:Array[String] = [
 	'Mod at "%s" could not unpack, unable to create temporary directory.',
 	'Mod at "%s" could not transfer item in ZIP "%s" to temporary directory with reason "%s".',
 	'Mod "%s": Unexpected mod type "%s" in directory "%s". Make sure this mod is in the correct directory.',
+	'Mod "%s": Failed loading resource "%s", cannot access forbidden path "%s".',
 ]
 
 const warning_strings:Array[String] = [

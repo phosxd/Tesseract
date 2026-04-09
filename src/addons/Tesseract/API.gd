@@ -59,13 +59,22 @@ var mods_path: String:
 		return config.get_value('game', 'mods_path', '')
 
 ## Path to load all mods into.
-## If path ends with "*" will put the mod into a sub-directory with the name of the mod (or file name if details are unavailable)
+## If path ends with "*" will put the mod into a sub-directory with the ID of the mod.
 var load_mods_into_path: String:
 	set(value):
 		load_mods_into_path = value
 		config.set_value('game', 'load_mods_into_path', value)
 	get():
 		return config.get_value('game', 'load_mods_into_path', '')
+
+
+## Path mods cannot overwirte or write into.
+var forbidden_paths: Array:
+	set(value):
+		forbidden_paths = value
+		config.set_value('game', 'forbidden_paths', value)
+	get():
+		return config.get_value('game', 'forbidden_paths', [])
 
 ## If true, Tesseract will load in mods that don't have any configuration, name, or other details.
 ## These mods will not be accesible to the game in any way.
@@ -225,6 +234,7 @@ func load_mod(path:String, expected_type:String) -> void:
 
 	var cfg_game_api_version = config.get_value(mod_type_section, 'api_version', game_api_version)
 	var cfg_load_into_path:String = config.get_value(mod_type_section, 'load_mods_into_path', load_mods_into_path)
+	var cfg_forbidden_paths:Array = config.get_value(mod_type_section, 'forbidden_paths', forbidden_paths)
 	var cfg_allow_mod_scripts:bool = config.get_value(mod_type_section, 'allow_mod_scripts', allow_mod_scripts)
 	var cfg_blocked_script_keywords:Array = config.get_value(mod_type_section, 'blocked_script_keywords', blocked_script_keywords)
 	# Check version compatibility.
@@ -256,6 +266,7 @@ func load_mod(path:String, expected_type:String) -> void:
 
 	var cfg:Dictionary[String,Variant] = {
 		'load_into_path': cfg_load_into_path,
+		'forbidden_paths': cfg_forbidden_paths,
 		'allow_mod_scripts': cfg_allow_mod_scripts,
 		'blocked_script_keywords': cfg_blocked_script_keywords,
 	}
@@ -286,7 +297,21 @@ func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod
 	var relative_path:String = file_path.trim_prefix(mod_path+'/')
 	if relative_path in ['INIT.gd','MOD.cfg']: return
 	if relative_path in mod_instance.resources: return
-	var res_path:String = 'res://'+cfg.load_into_path+('' if cfg.load_into_path.ends_with('/') or cfg.load_into_path.is_empty() else '/')+'%s' % relative_path
+	# Get path to put the resource.
+	var res_path:String = 'res://'+cfg.load_into_path+('' if cfg.load_into_path.ends_with('/') else '/')
+	res_path = res_path.replace('*',mod_instance.id) + '%s' % relative_path
+
+	# Check if the resource path is in a forbidden directory or is a forbidden file.
+	for forbidden_path:String in cfg.forbidden_paths:
+		if not forbidden_path.begins_with('res://'): forbidden_path = 'res://'+forbidden_path
+		if forbidden_path.ends_with('/'):
+			if res_path.begins_with(forbidden_path):
+				TesseractErrorServer.error.emit(14, [mod_instance.id,relative_path,forbidden_path])
+				return
+		elif res_path == forbidden_path:
+			TesseractErrorServer.error.emit(14, [mod_instance.id,relative_path,forbidden_path])
+			return
+
 	var ext:String = file_path.get_extension()
 	# Load resource.
 	if ext in resource_extensions:
