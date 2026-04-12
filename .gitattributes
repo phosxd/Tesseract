@@ -3,6 +3,7 @@
 
 # Only include the addons folder when downloading from the Asset Library.
 /**            export-ignore
+/src     !export-ignore
 /src/**  !export-ignore
 
 # Don't include UID files.
