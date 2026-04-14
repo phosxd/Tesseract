@@ -2,7 +2,7 @@
 
 <img src="./git_assets/icon.png" align=""></img>
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 
 Tesseract is a mod loader for Godot 4.6 that gives both modders & game developers the tools they need to easily implement seamless mods.
 
@@ -151,13 +151,9 @@ mod_dependencies=["Other Mod 1", "Other Mod 2"]
 ; It is VERY important that this path is accurate, does not conflict with other mods, & does not conflict with of the game's paths either.
 ; Set this path to empty if you do not reference any mod resources in your mod.
 real_path="res://Example Mods/My Mod by John Doe"
-; Resources that will be loaded before everything else. Use this to define load order.
-; Paths should be relative to the mod root directory.
-priority_paths=[
-  "Assets/example.gd",
-  "Assets/example.tscn",
-  ; Example: script needs to be loaded before the scene.
-]
+; Resources that will be loaded before everything else. Paths should be relative to the mod root directory.
+; Note: resource dependencies are automatically resolved, you do not need to use this to ensure resources are loaded in the correct order.
+priority_paths=[]
 ```
 
 Your config file should be located in the *root directory of your mod* & have the exact name `MOD.cfg`.

@@ -27,6 +27,10 @@ window/size/viewport_width=700
 window/size/viewport_height=400
 window/stretch/mode="canvas_items"
 
+[dotnet]
+
+project/assembly_name="Tesseract"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/Tesseract/plugin.cfg")

@@ -160,7 +160,7 @@ func load_mods() -> void:
 			# If path is a file, unpack ZIP & change mod path to temp directory.
 			var temp_dir
 			if not mod_path.get_extension().is_empty() && zip_supported:
-				var reader := ZIPReader.new()
+				var reader = ClassDB.instantiate('ZIPReader')
 				var err:int = reader.open(mod_path)
 				if err != OK:
 					TesseractErrorServer.error.emit(10, [mod_path])
@@ -170,7 +170,7 @@ func load_mods() -> void:
 				if not temp_dir:
 					TesseractErrorServer.error.emit(11, [mod_path])
 					continue
-				var temp_path:String = temp_dir.get_current_dir()
+				var temp_path:String = temp_dir.get_current_dir()+'/'
 
 				# Check if all files share the same top-most directory.
 				var has_common_directory:bool = true
@@ -196,16 +196,18 @@ func load_mods() -> void:
 						continue
 					file.store_buffer(reader.read_file(og_file_path))
 					file.close()
+
 				mod_path = temp_path
 
 			# Load mod.
+			if mod_path.get_extension().is_empty(): mod_path += '' if mod_path.ends_with('/') else '/'
 			load_mod(mod_path, type)
 
 
 ## Load a mod from the [param path].
 func load_mod(path:String, expected_type:String) -> void:
 	# Get mod config.
-	var mod_config_path:String = path+'/MOD.cfg'
+	var mod_config_path:String = path+'MOD.cfg'
 	var mod_config := ConfigFile.new()
 	var mod_config_err:Error = mod_config.load(mod_config_path)
 	if mod_config_err != OK:
@@ -248,7 +250,7 @@ func load_mod(path:String, expected_type:String) -> void:
 		return
 
 	# Get mod script.
-	var mod_script_path:String = path+'/INIT.gd'
+	var mod_script_path:String = path+'INIT.gd'
 	var mod_script
 	if cfg_allow_mod_scripts && FileAccess.file_exists(mod_script_path):
 		mod_script = load(mod_script_path) as GDScript
@@ -273,7 +275,7 @@ func load_mod(path:String, expected_type:String) -> void:
 
 	# Iterate through priority resources & load them first.
 	for relative_path:String in mod_instance.priority_paths:
-		_load_into_mod(path+'/'+relative_path, path, mod_instance, cfg, '')
+		_load_into_mod(path+relative_path.trim_suffix('/'), path, mod_instance, cfg, '')
 	# Walk through all resources in the mod & load them.
 	TesseractUtils.walk_dir(path, _load_into_mod.bind(path, mod_instance, cfg, ''))
 
@@ -294,7 +296,7 @@ func _is_script_compliant(mod_id:String, script:Script, blocked_keywords:Array, 
 
 
 func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod, cfg:Dictionary, requested_by:String='') -> void:
-	var relative_path:String = file_path.trim_prefix(mod_path+'/')
+	var relative_path:String = file_path.trim_prefix(mod_path)
 	if relative_path in ['INIT.gd','MOD.cfg']: return
 	if relative_path in mod_instance.resources: return
 	# Get path to put the resource.
@@ -315,6 +317,15 @@ func _load_into_mod(file_path:String, mod_path:String, mod_instance:TesseractMod
 	var ext:String = file_path.get_extension()
 	# Load resource.
 	if ext in resource_extensions:
+		# Load dependencies of the resource.
+		if not mod_instance.real_path.is_empty():
+			for dependency:String in ResourceLoader.get_dependencies(file_path):
+				var dependency_path:String = dependency.split('::')[-1]
+				# Only load dependency into the mod if the dependency is expected to be in the mod. Otherwise, let Godot resolve it.
+				if dependency_path.begins_with(mod_instance.real_path):
+					var dependency_path_on_disk:String = mod_path+dependency_path.replace(mod_instance.real_path,'')
+					_load_into_mod(dependency_path_on_disk, mod_path, mod_instance, cfg)
+		# Load the resource.
 		var res = load(file_path)
 		if res is Script:
 			_load_mod_script(mod_instance, relative_path, res, res_path, file_path, cfg)
