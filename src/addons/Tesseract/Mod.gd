@@ -3,7 +3,6 @@
 
 ## Full config file for the mod.
 var config: ConfigFile
-var scene_variables:Dictionary[String,Dictionary] = {}
 
 ## Unique mod identifier.
 var id: String

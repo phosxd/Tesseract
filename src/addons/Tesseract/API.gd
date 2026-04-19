@@ -5,7 +5,6 @@
 ##[br]Set [param signal_map] to provide signals that mods can call.
 extends Node
 
-const config_path:String = 'res://addons/Tesseract/plugin.cfg'
 ## Tesseract API version.
 const api_version:int = 1
 const tmod_extensions:Array[String] = ['zip','tmod']
@@ -420,6 +419,37 @@ func _load_mod_scene(mod_instance:TesseractMod, relative_path:String, res:Packed
 			node.get_parent().remove_child(node)
 			node.queue_free()
 
+		# Reorder nodes.
+		for node_path:String in scene_instance.reorder_node_paths:
+			var relative_index:int = scene_instance.reorder_node_paths[node_path]
+			var node = base_scene_instance.get_node_or_null(node_path) as Node
+			if not node: continue
+			node.get_parent().move_child(node, node.get_index()+relative_index)
+
+		# Set scene variables.
+		for property:String in scene_instance.scene_properties:
+			var value:Variant = scene_instance.scene_properties[property]
+			scene_instance.set(property, value)
+
+		# Set node properties.
+		for property_setter:Node in scene_instance.find_children('*', 'NodePropertySetter'):
+			if property_setter is not NodePropertySetter: continue
+			var node_path:NodePath = scene_instance.get_path_to(property_setter)
+			var node = base_scene_instance.get_node_or_null(node_path) as Node
+			if not node: continue
+			# Set ancesters as editable.
+			var ancestor: Node
+			while true:
+				if not ancestor: ancestor = node.get_parent()
+				else: ancestor = ancestor.get_parent()
+				if ancestor == null: break
+				if not base_scene_instance.is_ancestor_of(ancestor): break
+				base_scene_instance.set_editable_instance(ancestor, true)
+			# Set properties.
+			for property:String in property_setter.properties:
+				var value:Variant = property_setter.properties[property]
+				node.set(property,value)
+
 		# Pack the merged scene then delete the instances.
 		res.pack(base_scene_instance)
 		scene_instance.queue_free()
@@ -432,23 +462,3 @@ func _load_mod_cfg(mod_instance:TesseractMod, relative_path:String, res:ConfigFi
 	var res_err:Error = res.load(file_path)
 	if res_err != OK: return
 	var parent_path:String = res_path.trim_suffix('.cfg')
-
-	if res.has_section('SceneVariables'):
-		mod_instance.scene_variables.set(parent_path, {})
-		for key:String in res.get_section_keys('SceneVariables'):
-			mod_instance.scene_variables[parent_path].set(key, res.get_value('SceneVariables',key))
-
-		var scene = load(parent_path)
-		if scene is PackedScene:
-			var variable_setter := SceneVariableSetter.new()
-			variable_setter.name = 'SceneVariableSetter'
-			variable_setter.mod_id = mod_instance.id
-			var scene_instance:Node = scene.instantiate()
-			scene_instance.add_child(variable_setter)
-			variable_setter.owner = scene_instance
-
-			# Pack the scene then delete the instance.
-			scene.pack(scene_instance)
-			scene_instance.queue_free()
-
-			mod_instance.add_resource(relative_path, parent_path, scene)

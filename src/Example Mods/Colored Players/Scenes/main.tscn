@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bbrclbm4j0j2l"]
+
+[ext_resource type="Script" uid="uid://54hah8qtvily" path="res://addons/Tesseract/Nodes/SceneMerger.gd" id="1_6802k"]
+[ext_resource type="Script" uid="uid://k2myyflspaq2" path="res://addons/Tesseract/Nodes/NodePropertySetter.gd" id="2_2vsad"]
+
+[node name="Main" type="Node" unique_id=1290376605]
+script = ExtResource("1_6802k")
+metadata/_custom_type_script = "uid://54hah8qtvily"
+
+[node name="Player 1" type="Node" parent="." unique_id=893504305]
+
+[node name="Color" type="Node" parent="Player 1" unique_id=1853822004]
+script = ExtResource("2_2vsad")
+properties = Dictionary[String, Variant]({
+"color": Color(0, 0, 1, 1)
+})
+metadata/_custom_type_script = "uid://k2myyflspaq2"
+
+[node name="Player 2" type="Node" parent="." unique_id=994954126]
+
+[node name="Color" type="Node" parent="Player 2" unique_id=1748623241]
+script = ExtResource("2_2vsad")
+properties = Dictionary[String, Variant]({
+"color": Color(1, 0, 0, 1)
+})
+metadata/_custom_type_script = "uid://k2myyflspaq2"

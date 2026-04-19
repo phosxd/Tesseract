@@ -12,10 +12,6 @@ normal = Vector2(0, 1)
 
 [node name="Main" type="Node2D" unique_id=1016540715]
 script = ExtResource("1_7md66")
-background_color = Color(0.101960786, 0.101960786, 0.101960786, 1)
-player_1_color = Color(1, 1, 1, 1)
-player_2_color = Color(1, 1, 1, 1)
-ball_color = Color(1, 1, 1, 1)
 
 [node name="Background" type="ColorRect" parent="." unique_id=1428276429]
 unique_name_in_owner = true

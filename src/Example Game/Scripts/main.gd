@@ -1,9 +1,5 @@
 extends Node2D
 
-@export var background_color: Color
-@export var player_1_color: Color
-@export var player_2_color: Color
-@export var ball_color: Color
 @export var start_ball_force:float = 300
 
 var player_1_score:int = 0
@@ -20,10 +16,6 @@ func reset() -> void:
 
 
 func _ready() -> void:
-	%Background.color = background_color
-	%'Player 1'.get_node('Color').color = player_1_color
-	%'Player 2'.get_node('Color').color = player_2_color
-	%Ball.color = ball_color
 	reset()
 
 
