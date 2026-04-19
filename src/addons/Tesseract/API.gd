@@ -5,6 +5,7 @@
 ##[br]Set [param signal_map] to provide signals that mods can call.
 extends Node
 
+const config_path:String = 'res://addons/Tesseract/plugin.cfg'
 ## Tesseract API version.
 const api_version:int = 1
 const tmod_extensions:Array[String] = ['zip','tmod']
@@ -40,7 +41,7 @@ var signal_map:Dictionary[String,Signal] = {}
 
 #region config
 
-var config := ConfigFile.new()
+var config := TesseractConfigHandler.config_file
 
 ## Current version of the game's API.
 var game_api_version: Variant:
@@ -101,8 +102,6 @@ var blocked_script_keywords: Array:
 
 #endregion
 
-var config_loaded:bool = false
-
 ## Every loaded mod instance.
 var mod_instances:Dictionary[String,TesseractMod] = {}
 ## An ordered list of all mod resources for correct unloading.
@@ -110,15 +109,8 @@ var _resource_trace:Array[Dictionary] = []
 var _can_trace_resources:bool = true
 
 
-func _init() -> void:
-	var err:Error = config.load('res://addons/Tesseract/plugin.cfg')
-	if err != OK:
-		return
-	config_loaded = true
-
-
 func _ready() -> void:
-	if not config_loaded:
+	if not TesseractConfigHandler.config_file_loaded:
 		TesseractErrorServer.error.emit(1)
 
 

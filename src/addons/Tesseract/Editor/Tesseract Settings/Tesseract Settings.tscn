@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://dqxb4ecn5brmd"]
+
+[ext_resource type="Script" uid="uid://bs5mjptatx81s" path="res://addons/Tesseract/Editor/Tesseract Settings/auto_exports.gd" id="1_0exul"]
+[ext_resource type="Script" uid="uid://chsxvvfkf3p20" path="res://addons/Tesseract/Editor/Tesseract Settings/tesseract_settings.gd" id="1_hihax"]
+
+[node name="Tesseract Settings" type="ScrollContainer" unique_id=681034625]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hihax")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1166321466]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Auto-Exports" type="FoldableContainer" parent="VBox" unique_id=2083578589]
+unique_name_in_owner = true
+layout_mode = 2
+title = "Auto-Exports"
+script = ExtResource("1_0exul")
+
+[node name="AE List" type="VBoxContainer" parent="VBox/Auto-Exports" unique_id=1182463716]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="New AE" type="HBoxContainer" parent="VBox/Auto-Exports/AE List" unique_id=1184510920]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="AE Mod Path" type="LineEdit" parent="VBox/Auto-Exports/AE List/New AE" unique_id=160755982]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Mod path... (res://mods/mod/)"
+
+[node name="AE Output Path" type="LineEdit" parent="VBox/Auto-Exports/AE List/New AE" unique_id=1220173340]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Output path... (user://mods/mod)"
+
+[node name="AE Add" type="Button" parent="VBox/Auto-Exports/AE List/New AE" unique_id=1768109158]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Add"
+
+[connection signal="text_changed" from="VBox/Auto-Exports/AE List/New AE/AE Mod Path" to="VBox/Auto-Exports" method="_on_ae_mod_path_text_changed"]
+[connection signal="text_changed" from="VBox/Auto-Exports/AE List/New AE/AE Output Path" to="VBox/Auto-Exports" method="_on_ae_output_path_text_changed"]
+[connection signal="pressed" from="VBox/Auto-Exports/AE List/New AE/AE Add" to="VBox/Auto-Exports" method="_on_ae_add_pressed"]

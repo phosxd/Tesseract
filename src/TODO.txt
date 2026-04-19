@@ -1,1 +1,2 @@
 - Add `.import` file parsing.
+- Add ability to move existng nodes in a scene, not just add, remove, or replace them.

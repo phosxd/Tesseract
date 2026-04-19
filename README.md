@@ -46,10 +46,18 @@ Unlike with PCKs, Tesseract mods don't have to bundle in every asset it uses fro
 Although if you'd like, you can still bundle game assets into your mod, but beware it will overwrite the base game's original file.
 
 ## Editor integration
-Tesseract has multiple in-editor tools to help you out.
+One of my goals for Tesseract is for development to be as frictionless as humanly possible. That's why Tesseract offers multiple in-editor tools that make it much easier to develop for than alternatives. 
 
-- "Export TMOD" file system context menu option. Packs & exports the selected mod as a ZIP file.
-- "Create new Mod" file system context menu option. Automatically creates a fresh mod directory with all the required files added.
+### Context menu export
+File system context menu option that opens a file save dialog for packing & exporting the selected mod as a TMOD ZIP file.
+Useful for quickly sharing your packaged mod.
+
+### Context menu mod creation
+File system context menu option that opens a dialog that lets you input basic information to automatically create a new mod directory with all required files added.
+This way, you won't need to constantly refer to the documentation to create a new mod.
+
+### Auto-exporting
+The very last tab in project settings should be a tab called "Tesseract Settings", in that tab you can add & manage a list of mods that will automatically be re-exported to the given location (as TMOD, ZIP or folder) before running the project. This is very useful for quick prototyping & brings mods one step closer to being just as good as native resources in the editor.
 
 ## Runtime unloading
 Tesseract allows you to unload individual mods to restore original resources in the virtual file system.
