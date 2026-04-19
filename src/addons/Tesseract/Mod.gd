@@ -1,7 +1,7 @@
 ## Tesseract mod instance.
 @abstract class_name TesseractMod extends Object
 
-## Full config file for this mod.
+## Full config file for the mod.
 var config: ConfigFile
 var scene_variables:Dictionary[String,Dictionary] = {}
 
@@ -11,6 +11,9 @@ var id: String
 var name: String
 ## Mod author. Optional.
 var author: String
+## Public link to the mod. Optional.
+## [br][br]Can be a store or repository hosting the mod.
+var source: String
 ## Short description of the mod. Optional.
 var description_short: String
 ## Long description of the mod. Optional.
@@ -26,6 +29,9 @@ var for_game_versions:Array[int] = [1]
 var for_tesseract_verions:Array[int] = [1]
 ## Mod IDs this mod requires to work.
 var mod_dependencies := PackedStringArray()
+## Direct link to a repository hosting the mod's files.
+## This can be used to automatically check for updates & update the mod if the direct source is correct.
+var direct_source: String
 ## The mod's development path.
 var real_path: String
 ## Resources to load before all others.
@@ -40,6 +46,20 @@ var resources:Dictionary[String,Resource] = {}
 ## [param signal_name] & [param args] values depend on game documentation.
 @abstract func recieve_signal(signal_name:String, ...args) -> void
 
+
+## Send a signal to the game.
+func send_signal(name:String, ...args) -> Error:
+	var sig = TesseractAPI.signal_map.get(name)
+	if not sig:
+		return ERR_DOES_NOT_EXIST
+	sig = sig as Signal
+
+	sig.emit.callv(args)
+
+	return OK
+
+
+#region resource management
 
 ## Releases all resources from the virtual filesystem, replaced by the next mod or the original resource.
 ## [br]
@@ -106,6 +126,8 @@ func _add_resource(relative_path:String, resource_path:String, resource:Resource
 		# Take over path in virtual file system.
 		resource.take_over_path(resource_path)
 
+#endregion
+
 
 #region file system
 
@@ -146,13 +168,49 @@ func get_files_at(path:String) -> PackedStringArray:
 #endregion
 
 
-## Send a signal to the game.
-func send_signal(name:String, ...args) -> Error:
-	var sig = TesseractAPI.signal_map.get(name)
-	if not sig:
-		return ERR_DOES_NOT_EXIST
-	sig = sig as Signal
+#region network
 
-	sig.emit.callv(args)
+## Returns the file located at [member direct_source] [param file] if there is one. Returns empty if nothing found.
+## Some repositories may use ".paths" to list out each file available for download.
+func get_ds_file(file:String='.paths') -> PackedByteArray:
+	if direct_source.is_empty(): return []
+	var url = direct_source.replace(' ','%20')+'/'+file
 
-	return OK
+	var client := HTTPRequest.new()
+	TesseractAPI.add_child(client)
+	await client.ready
+
+	var req_err:Error = client.request(url, [], HTTPClient.METHOD_GET)
+	if req_err != OK: return []
+
+	var parameters:Array[Variant] = await client.request_completed
+	var err:int = parameters[0]
+	var response_code:int = parameters[1]
+	var body:PackedByteArray = parameters[3]
+
+	if err != OK:
+		printerr('Request failed with error: %s' % error_string(err))
+		return []
+	if response_code != 200:
+		printerr('Request failed with response code: %s' % response_code)
+		return []
+
+	client.queue_free()
+	return body
+
+
+## Returns the [ConfigFile] located at [member direct_source][code]/MOD.cfg[/code] if there is one. Returns [code]null[/code] if none found.
+func get_ds_config() -> ConfigFile:
+	var bytes:PackedByteArray = await self.get_ds_file('MOD.cfg')
+	if bytes.is_empty(): return null
+	var raw_text:String = bytes.get_string_from_utf8()
+
+	var ds_config := ConfigFile.new()
+	var parse_err:Error = ds_config.parse(raw_text)
+	if parse_err != OK:
+		printerr('Failed to parse config file: %s' % error_string(parse_err))
+		return null
+
+	return ds_config
+
+#endregion
