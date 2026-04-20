@@ -143,24 +143,33 @@ name="My Mod"
 author="John Doe"
 ; String representation of the mod version.
 version_string="1.0.0"
+; Short description.
+description_short="Short description of this mod."
+; Long description.
+description_long="Long description of this mod, should include a list of all changes made."
+; Public link to the mod.
+; Can be a store or repository hosting the mod.
+source=""
+
 ; Version of the mod.
 version_number=1
 ; All game API versions this mod is expected to work for.
 for_game_versions=[1]
 ; All Tesseract versions this mod is expected to work for.
 for_tesseract_versions=[1]
-description_short="Short description of this mod."
-description_long="Long description of this mod, should include a list of all changes made."
 ; Optional. Mod IDs that must be present & loaded before this mod.
-mod_dependencies=["Other Mod 1", "Other Mod 2"]
+mod_dependencies=[]
+; Direct link to a repository hosting the mod's files.
+; This can be used to automatically check for updates & update the mod if the direct source is correct.
+direct_source=""
 
 ; The path being used for development. To get this path right click on the root directory of the mod & select "Copy Path".
 ; This will be used to map resource paths for use inside of this mod.
 ; It is VERY important that this path is accurate, does not conflict with other mods, & does not conflict with of the game's paths either.
 ; Set this path to empty if you do not reference any mod resources in your mod.
 real_path="res://Example Mods/My Mod by John Doe"
-; Resources that will be loaded before everything else. Paths should be relative to the mod root directory.
-; Note: resource dependencies are automatically resolved, you do not need to use this to ensure resources are loaded in the correct order.
+; Resources that will be loaded before everything else. Use this to define load order.
+; Paths should be relative to the mod root directory.
 priority_paths=[]
 ```
 
