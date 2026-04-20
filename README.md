@@ -84,12 +84,14 @@ Here is a list of all built-in metadata fields:
 - *for_tesseract_versions: Array\[int\]
 - name: String
 - author: String
-- version_string: String
 - description_short: String
 - description_long: String
+- version_string: String
+- source: String (URL)
 - mod_dependencies: Array\[String\]
 - real_path: String
 - priority_paths: Array\[String\]
+- direct_source: String (URL)
 
 Mods can provide any additional metadata fields they want.
 
@@ -200,12 +202,17 @@ Always follow the game's documentation for locations to put your mod files.
 
 Referencing resources from inside your mod (I.E a scene relying on a script only present inside your mod) is fine & will work so long as you have correctly set the mod's `real_path` config value & it is not overlapping with any other paths that may be present in other mods or in the game.
 
+It is recommended to include a `.paths` text file in the root directory of your mod containing a list of all files in your mod as relative paths. This way if you have a direct source configured & the direct source contains your mod files, then the game can implement functions to check for updates & even download new versions of your mod.
+An example `.paths` file would look like this:
+```
+MOD.cfg
+Assets/example.tres
+```
+
 There is not anything else to say here, the rest is up to the game itself to document.
 
 ## Export
-Tesseract lets you export your mod directly from the Godot editor, just right click the folder holding the mod then select the "Export TMOD" option near the bottom. The option will only show up for folders containing a valid mod.
-
-Selecting the "Export TMOD" option will open a file save dialog menu where you can choose where to save the zipped mod.
+Tesseract lets you export your mod directly from the Godot editor, just right click the folder holding the mod then select the "Export TMOD" option near the bottom. The option will only show up for folders containing a valid mod. Selecting the "Export TMOD" option will open a file save dialog menu where you can choose where to save the zipped mod.
 
 Exported mods do not include UID files or any editor specific files that will not be used in the actual mod.
 
