@@ -14,16 +14,21 @@ grow_horizontal = 2
 size_flags_horizontal = 3
 script = ExtResource("1_n82xu")
 
+[node name="Enabled" type="CheckBox" parent="." unique_id=50894942]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+
 [node name="Apply" type="Button" parent="." unique_id=1831442582]
 unique_name_in_owner = true
 layout_mode = 2
 disabled = true
-icon = SubResource("DPITexture_n82xu")
-flat = true
+text = "Apply"
 
 [node name="Mod Path" type="LineEdit" parent="." unique_id=1918924761]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Mod Path"
 expand_to_text_length = true
 
@@ -37,8 +42,8 @@ stretch_mode = 3
 [node name="Output Path" type="LineEdit" parent="." unique_id=501566947]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Output Path"
-expand_to_text_length = true
 
 [node name="Move Up" type="Button" parent="." unique_id=1692010055]
 unique_name_in_owner = true
@@ -61,6 +66,7 @@ size_flags_horizontal = 8
 icon = SubResource("DPITexture_n82xu")
 flat = true
 
+[connection signal="toggled" from="Enabled" to="." method="_on_enabled_toggled"]
 [connection signal="pressed" from="Apply" to="." method="_on_apply_pressed"]
 [connection signal="text_changed" from="Mod Path" to="." method="_on_mod_path_text_changed"]
 [connection signal="text_changed" from="Output Path" to="." method="_on_output_path_text_changed"]

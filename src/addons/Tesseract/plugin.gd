@@ -60,10 +60,12 @@ func _build() -> bool:
 
 	# Export every mod in auto exports.
 	for item:Array in auto_exports:
-		if item.size() != 2: continue
-		var output_path = item[0]
-		var mod_path = item[1]
-		if output_path is not String or mod_path is not String: continue
+		if item.size() != 3: continue
+		var enabled = item[0]
+		var output_path = item[1]
+		var mod_path = item[2]
+		if enabled is not bool or output_path is not String or mod_path is not String: continue
+		if not enabled: continue
 		print('Exporting mod "%s" to "%s".' % [mod_path,output_path])
 		# Export package if output path has valid extension.
 		if output_path.to_lower().get_extension() in ['tmod','zip']:
