@@ -49,12 +49,9 @@ var resources:Dictionary[String,Resource] = {}
 ## Send a signal to the game.
 func send_signal(name:String, ...args) -> Error:
 	var sig = TesseractAPI.signal_map.get(name)
-	if not sig:
-		return ERR_DOES_NOT_EXIST
+	if not sig: return ERR_DOES_NOT_EXIST
 	sig = sig as Signal
-
 	sig.emit.callv(args)
-
 	return OK
 
 

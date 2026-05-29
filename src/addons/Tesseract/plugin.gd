@@ -81,7 +81,6 @@ func _build() -> bool:
 			# Copy mod into output path.
 			else:
 				OS.move_to_trash(output_path)
-				DirAccess.make_dir_absolute(output_path)
 				TesseractUtils.walk_dir(mod_path, func(file_path:String) -> void:
 					if file_path.to_lower().get_extension() in ['uid']: return
 					var relative_path:String = file_path.trim_prefix(mod_path)

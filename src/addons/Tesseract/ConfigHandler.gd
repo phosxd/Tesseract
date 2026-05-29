@@ -34,7 +34,7 @@ static func save() -> void:
 		else:
 			var split_line:PackedStringArray = line.split('=')
 			if split_line.size() == 2:
-				var field_name:String = split_line[0]
+				var field_name:String = split_line[0].replace(' ','')
 				var field_value:String = split_line[1]
 				var field_value_start:int = char_index+split_line[0].length()+1
 				result = result.erase(field_value_start, field_value.length())
