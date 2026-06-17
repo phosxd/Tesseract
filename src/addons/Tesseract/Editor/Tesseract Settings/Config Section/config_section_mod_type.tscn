@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://1qg7bfg8guid"]
+
+[ext_resource type="Script" uid="uid://dg7ryob0mgs5h" path="res://addons/Tesseract/Editor/Tesseract Settings/Config Section/config_section_mod_type.gd" id="1_tnvd8"]
+[ext_resource type="PackedScene" uid="uid://bnjvecx3siwyq" path="res://addons/Tesseract/Editor/Tesseract Settings/Config Section/field.tscn" id="2_hxsq0"]
+
+[node name="Config Section Mod Type" type="FoldableContainer" unique_id=73807843]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 63.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+title = "MOD TYPE: "
+script = ExtResource("1_tnvd8")
+section = ""
+section_prefix = "MOD TYPE: "
+auto_populate = false
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=571334979]
+layout_mode = 2
+
+[node name="HBox" type="HBoxContainer" parent="VBox" unique_id=1833590032]
+layout_mode = 2
+
+[node name="Name" type="LineEdit" parent="VBox/HBox" unique_id=768175019]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Name of the section..."
+
+[node name="Apply" type="Button" parent="VBox/HBox" unique_id=946363125]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Apply"
+
+[node name="Delete" type="Button" parent="VBox/HBox" unique_id=1149204685]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Priority" parent="VBox" unique_id=956300421 instance=ExtResource("2_hxsq0")]
+layout_mode = 2
+setting_key = "priority"
+title = "Priority"
+value = "1"
+value_type = 2
+
+[node name="API Version" parent="VBox" unique_id=446180129 instance=ExtResource("2_hxsq0")]
+layout_mode = 2
+setting_key = "api_version"
+title = "API Version"
+value = "1"
+value_type = 2
+
+[node name="Load From Path" parent="VBox" unique_id=1984799999 instance=ExtResource("2_hxsq0")]
+layout_mode = 2
+setting_key = "load_from_path"
+title = "Load From Path"
+value = "\"user://MODS/\""
+value_type = 4
+
+[node name="Load Into Path2" parent="VBox" unique_id=66040239 instance=ExtResource("2_hxsq0")]
+layout_mode = 2
+setting_key = "load_into_path"
+title = "Load Into Path"
+value = "\"\""
+value_type = 4
+
+[node name="Allow Mods Without Details" parent="VBox" unique_id=369451312 instance=ExtResource("2_hxsq0")]
+layout_mode = 2
+setting_key = "allow_mods_without_details"
+title = "Allow Mods Without Details"
+value = "false"
+value_type = 1
+
+[node name="Allow Overwriting Files" parent="VBox" unique_id=1276815099 instance=ExtResource("2_hxsq0")]
+layout_mode = 2
+setting_key = "allow_overwriting_files"
+title = "Allow Overwriting Files"
+value = "true"
+value_type = 1
+
+[node name="Allow Creating Files" parent="VBox" unique_id=514465066 instance=ExtResource("2_hxsq0")]
+layout_mode = 2
+setting_key = "allow_creating_files"
+title = "Allow Creating Files"
+value = "true"
+value_type = 1
+
+[node name="Allow Mod Scripts" parent="VBox" unique_id=385480116 instance=ExtResource("2_hxsq0")]
+layout_mode = 2
+setting_key = "allow_mod_scripts"
+title = "Allow Mod Scripts"
+value = "true"
+value_type = 1
+
+[node name="Blocked Script Keywords" parent="VBox" unique_id=1262269915 instance=ExtResource("2_hxsq0")]
+layout_mode = 2
+setting_key = "blocked_script_keywords"
+title = "Blocked Script Keywords"
+value = "[\"FileAccess\", \"DirAccess\"]"
+value_type = 28
+
+[connection signal="text_changed" from="VBox/HBox/Name" to="." method="_on_name_text_changed"]
+[connection signal="pressed" from="VBox/HBox/Apply" to="." method="_on_apply_pressed"]
+[connection signal="pressed" from="VBox/HBox/Delete" to="." method="_on_delete_pressed"]

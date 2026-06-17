@@ -9,10 +9,10 @@ signal moved(up:bool)
 
 func _ready() -> void:
 	if is_part_of_edited_scene(): return
-	var arrow_icon:Texture2D = self.get_theme_icon('ArrowRight', 'EditorIcons')
-	var delete_icon:Texture2D = self.get_theme_icon('Remove', 'EditorIcons')
-	var move_up_icon:Texture2D = self.get_theme_icon('MoveUp', 'EditorIcons')
-	var move_down_icon:Texture2D = self.get_theme_icon('MoveDown', 'EditorIcons')
+	var arrow_icon:Texture2D = get_theme_icon('ArrowRight', 'EditorIcons')
+	var delete_icon:Texture2D = get_theme_icon('Remove', 'EditorIcons')
+	var move_up_icon:Texture2D = get_theme_icon('MoveUp', 'EditorIcons')
+	var move_down_icon:Texture2D = get_theme_icon('MoveDown', 'EditorIcons')
 	%'Arrow Texture'.texture = arrow_icon
 	%Delete.icon = delete_icon
 	%'Move Up'.icon = move_up_icon

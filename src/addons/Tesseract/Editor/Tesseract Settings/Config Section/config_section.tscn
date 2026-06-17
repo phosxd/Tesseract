@@ -9,20 +9,33 @@ offset_bottom = 63.0
 grow_horizontal = 2
 size_flags_horizontal = 3
 script = ExtResource("1_r85mm")
+allow_deleting_section = false
+allow_changing_section_name = false
+can_disable_fields = false
 
 [node name="VBox" type="VBoxContainer" parent="." unique_id=571334979]
 layout_mode = 2
 
-[node name="Name" type="LineEdit" parent="VBox" unique_id=768175019]
-unique_name_in_owner = true
+[node name="HBox" type="HBoxContainer" parent="VBox" unique_id=1833590032]
 layout_mode = 2
-placeholder_text = "Name of the section..."
 
-[node name="Apply" type="Button" parent="VBox" unique_id=946363125]
+[node name="Name" type="LineEdit" parent="VBox/HBox" unique_id=768175019]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 3
+placeholder_text = "Name of the section..."
+editable = false
+
+[node name="Apply" type="Button" parent="VBox/HBox" unique_id=946363125]
+unique_name_in_owner = true
+layout_mode = 2
 text = "Apply"
 
-[connection signal="text_changed" from="VBox/Name" to="." method="_on_name_text_changed"]
-[connection signal="pressed" from="VBox/Apply" to="." method="_on_apply_pressed"]
+[node name="Delete" type="Button" parent="VBox/HBox" unique_id=857786151]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+
+[connection signal="text_changed" from="VBox/HBox/Name" to="." method="_on_name_text_changed"]
+[connection signal="pressed" from="VBox/HBox/Apply" to="." method="_on_apply_pressed"]
+[connection signal="pressed" from="VBox/HBox/Delete" to="." method="_on_delete_pressed"]

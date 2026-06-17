@@ -51,7 +51,8 @@ text = "Add"
 [node name="Sep 1" type="HSeparator" parent="VBox" unique_id=2011480459]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="VBox" unique_id=1648584535]
+[node name="Add Mod Type" type="Button" parent="VBox" unique_id=1648584535]
+unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Add a new mod type with it's own set of setting overrides."
 text = "Add Mod Type"
@@ -59,3 +60,4 @@ text = "Add Mod Type"
 [connection signal="text_changed" from="VBox/Auto-Exports/AE List/New AE/AE Mod Path" to="VBox/Auto-Exports" method="_on_ae_mod_path_text_changed"]
 [connection signal="text_changed" from="VBox/Auto-Exports/AE List/New AE/AE Output Path" to="VBox/Auto-Exports" method="_on_ae_output_path_text_changed"]
 [connection signal="pressed" from="VBox/Auto-Exports/AE List/New AE/AE Add" to="VBox/Auto-Exports" method="_on_ae_add_pressed"]
+[connection signal="pressed" from="VBox/Add Mod Type" to="." method="_on_add_mod_type_pressed"]
