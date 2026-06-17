@@ -139,7 +139,7 @@ If set to `true` (by default `false`), allow mods to be imported without having 
 If set to `true` (by default `true`), allow mods to overwrite existing files in the virual file system.
 When `false` this does *not* stop a script from within the mod overwriting files.
 
-## #Allow creating files
+### Allow creating files
 If set to `true` (by default `true`), Tesseract will allow mods to create new files in the virual file system.
 When `false` this does *not* stop a script from within the mod creating files.
 
@@ -160,7 +160,7 @@ To prevent these workarounds, use this list: `["ClassDB.", "Engine.", "GDScript.
 There are very well more workarounds that have not been or can not be accounted for.
 But this should be enough to deter most people from writing mallicious code.
 
-## (For mod types) priority
+### (For mod types) priority
 Load order priority, lower valued mod types will load their mods before higher valued mod types.
 
 
