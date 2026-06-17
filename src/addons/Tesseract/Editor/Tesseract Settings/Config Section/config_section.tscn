@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://dyvq3qtqkkwtl"]
+
+[ext_resource type="Script" uid="uid://cbdw8ejeljeow" path="res://addons/Tesseract/Editor/Tesseract Settings/Config Section/config_section.gd" id="1_r85mm"]
+
+[node name="Config Section" type="FoldableContainer" unique_id=73807843]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 63.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+script = ExtResource("1_r85mm")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=571334979]
+layout_mode = 2
+
+[node name="Name" type="LineEdit" parent="VBox" unique_id=768175019]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Name of the section..."
+
+[node name="Apply" type="Button" parent="VBox" unique_id=946363125]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Apply"
+
+[connection signal="text_changed" from="VBox/Name" to="." method="_on_name_text_changed"]
+[connection signal="pressed" from="VBox/Apply" to="." method="_on_apply_pressed"]

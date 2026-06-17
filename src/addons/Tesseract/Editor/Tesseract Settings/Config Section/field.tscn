@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://bnjvecx3siwyq"]
+
+[ext_resource type="Script" uid="uid://c47rur2edpxri" path="res://addons/Tesseract/Editor/Tesseract Settings/Config Section/field.gd" id="1_yy2np"]
+
+[node name="Field" type="HBoxContainer" unique_id=956300421]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 31.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+script = ExtResource("1_yy2np")
+
+[node name="Toggle" type="CheckButton" parent="." unique_id=2110920106]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Title" type="Label" parent="." unique_id=697367998]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Expected type: Nil"
+mouse_filter = 1
+
+[node name="Value" type="LineEdit" parent="." unique_id=138910630]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[connection signal="toggled" from="Toggle" to="." method="_on_toggle_toggled"]
+[connection signal="text_changed" from="Value" to="." method="_on_value_text_changed"]

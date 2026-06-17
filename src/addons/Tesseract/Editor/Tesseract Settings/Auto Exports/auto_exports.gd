@@ -1,11 +1,12 @@
 @tool
 extends FoldableContainer
 
-const item_scene:PackedScene = preload('res://addons/Tesseract/Editor/Tesseract Settings/Auto Export Item.tscn')
+const item_scene:PackedScene = preload('res://addons/Tesseract/Editor/Tesseract Settings/Auto Exports/Auto Export Item.tscn')
 var auto_exports:Array[Array] = []
 
 
 func _ready() -> void:
+	if is_part_of_edited_scene(): return
 	var config_auto_exports = TesseractConfigHandler.config_file.get_value('plugin', 'auto_exports', [])
 	for item:Array in config_auto_exports:
 		if item.size() != 3: continue

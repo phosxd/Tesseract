@@ -54,18 +54,18 @@ var game_api_version: Variant:
 var mods_path: String:
 	set(value):
 		mods_path = value
-		config.set_value('game', 'mods_path', value)
+		config.set_value('game', 'load_from_path', value)
 	get():
-		return config.get_value('game', 'mods_path', '')
+		return config.get_value('game', 'load_from_path', '')
 
 ## Path to load all mods into.
 ## If path ends with "*" will put the mod into a sub-directory with the ID of the mod.
 var load_mods_into_path: String:
 	set(value):
 		load_mods_into_path = value
-		config.set_value('game', 'load_mods_into_path', value)
+		config.set_value('game', 'load_into_path', value)
 	get():
-		return config.get_value('game', 'load_mods_into_path', '')
+		return config.get_value('game', 'load_into_path', '')
 
 
 ## Path mods cannot overwirte or write into.

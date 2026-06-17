@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dqxb4ecn5brmd"]
 
-[ext_resource type="Script" uid="uid://bs5mjptatx81s" path="res://addons/Tesseract/Editor/Tesseract Settings/auto_exports.gd" id="1_0exul"]
+[ext_resource type="Script" uid="uid://bs5mjptatx81s" path="res://addons/Tesseract/Editor/Tesseract Settings/Auto Exports/auto_exports.gd" id="1_0exul"]
 [ext_resource type="Script" uid="uid://chsxvvfkf3p20" path="res://addons/Tesseract/Editor/Tesseract Settings/tesseract_settings.gd" id="1_hihax"]
 
 [node name="Tesseract Settings" type="ScrollContainer" unique_id=681034625]
@@ -47,6 +47,14 @@ unique_name_in_owner = true
 layout_mode = 2
 disabled = true
 text = "Add"
+
+[node name="Sep 1" type="HSeparator" parent="VBox" unique_id=2011480459]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBox" unique_id=1648584535]
+layout_mode = 2
+tooltip_text = "Add a new mod type with it's own set of setting overrides."
+text = "Add Mod Type"
 
 [connection signal="text_changed" from="VBox/Auto-Exports/AE List/New AE/AE Mod Path" to="VBox/Auto-Exports" method="_on_ae_mod_path_text_changed"]
 [connection signal="text_changed" from="VBox/Auto-Exports/AE List/New AE/AE Output Path" to="VBox/Auto-Exports" method="_on_ae_output_path_text_changed"]

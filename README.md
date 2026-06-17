@@ -2,7 +2,7 @@
 
 <img src="./git_assets/icon.png" align=""></img>
 
-**Version:** 1.1.0
+**Version:** 2.0.0
 
 Tesseract is a mod loader for Godot 4.6 that gives both modders & game developers the tools they need to easily implement seamless mods.
 
@@ -21,8 +21,7 @@ Tesseract is a mod loader for Godot 4.6 that gives both modders & game developer
   - [Detailed metadata](#detailed-metadata)
 - [Downsides](#downsides)
   - [No import configuration](#no-import-configuration)
-- [Plugin setup (games)](#plugin-setup-games)
-- [Plugin setup (mods)](#plugin-setup-mods)
+- [Plugin settings](#plugin-settings)
 - [Install & use mods](#install-&-use-mods)
 - [Create a basic mod](#create-a-basic-mod)
 - [A guide on creating moddable games](#a-guide-on-creating-moddable-games)
@@ -103,16 +102,70 @@ Usually you'll find `.import` files next to assets like images & audio files. Th
 This might be implemented sooner or later, it all depends on the demand from myself or others.
 
 
-# Plugin setup (games)
-There is a slight setup process you need to go through before mods can work for your game & before developers can start modding your game.
+# Plugin settings
+You technically do not need to change the plugin's configurtion for it to work as expected, but it is definitely worth taking a look for features you might find useful.
 
-1. Edit `addons/Tesseract/plugin.cfg` to your liking. You can change how & where mods are loaded among many other things.
-2. Add plugin config file `addons/Tesseract/plugin.cfg` to export includes. This will allow the plugin to work after export.
-   <img src="./git_assets/export_includes.png" align=""></img>
+There are 2 ways you can edit the configuration, the first (& recommended) way to do this is through the "Tesseract Settings" tab in project settings. It is the most convenient & you don't have to worry about messing up the file's config format.
+The second way is to directly modify the `res://addons/Tesseract/plugin.cfg` file, though you must be careful not to break anything.
 
+You can create new mod types & set individual rule overrides for that mod type. Otherwise all mods will use the global settings.
 
-# Plugin setup (mods)
-Currently there is no setup process for mod developers when it comes to the actual plugin.
+## Auto-export config
+Add, modify, & toggle auto-exports. You can choose exactly where they should export to. All enabled auto-exports will be exported to it's set location the next time you run the project in the editor.
+
+## API version
+This integer determines the version of your game's API (or API version for a specific mod type if set within a mod type group), this should be updated to a higher value every time you publish your game with compatiility-breaking mod API changes.
+
+## Mods path
+The directory in which mods should be loaded from in the production version of your game. By default it is set to be in the game's "user data" directory under the "MODS" folder (`user://MODS/`).
+
+## Load mods into path
+The directory to load all mods into in the virtual file system (`res://`).
+If path ends with "*" will put the mod into a sub-directory with the name of the mod (or file name if details are unavailable).
+
+The path should not be an absolute path, or start with `res://` or `user://`. The directory is already assumed to be in `res://`.
+
+## Forbidden paths
+Paths in `res://` which mods are not allowed to add to or modify. Can be a file path or directory path (must end with "/" to be considered a directory). By default the `addons/` path is in this list so mods cannot modify any of your game's Godot plugins.
+
+This only stops files directly from the mod from being imported if it ends up in a forbidden path, this does *not* stop a script from within the mod accessing or overwriting resources in any location.
+
+## Allow mods without details
+If set to `true` (by default `false`), allow mods to be imported without having a valid confuration file. However mods without configuration will not be available to your game, but their changes will still be applied. Generally not recommended to change this setting.
+
+## Allow overwriting files
+If set to `true` (by default `true`), allow mods to overwrite existing files in the virual file system.
+When `false` this does *not* stop a script from within the mod overwriting files.
+
+## Allow creating files
+If set to `true` (by default `true`), Tesseract will allow mods to create new files in the virual file system.
+When `false` this does *not* stop a script from within the mod creating files.
+
+## Allow mod scripts
+If set to `true` (by default `true`), allow mods to include & run scripts (GDScript).
+
+## Blocked script keywords
+List of keywords that if found in a script will not load that script.
+This can (to an extent) be used to prevent the use of dangerous classes & autoload singletons.
+
+Workarounds:
+- ClassDB.class_call_static (Calling class methods through the ClassDB)
+- Engine.get_singleton (Getting singletons from the engine singleton)
+- GDScript. (Runtime script construction, to prevent scripts from being created at runtime it is necessary to block ALL GDScript methods)
+
+To prevent these workarounds, use this list: `["ClassDB.", "Engine.", "GDScript."]`
+
+There are very well more workarounds that have not been or can not be accounted for.
+But this should be enough to deter most people from writing mallicious code.
+
+## (For mod types) priority
+Load order priority, lower valued mod types will load their mods before higher valued mod types.
+
+## (For mod types) Load from path
+The directory in which mods of this type should be loaded from.
+
+## (For mod types) Load into path
+"Load mods into path" setting but only applied to mods of this type.
 
 
 # Install & use mods
