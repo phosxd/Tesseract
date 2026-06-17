@@ -110,10 +110,12 @@ The second way is to directly modify the `res://addons/Tesseract/plugin.cfg` fil
 
 You can create new mod types & set individual rule overrides for that mod type. Otherwise all mods will use the global settings.
 
+<img src="./git_assets/settings_gui.png" align=""></img>
+
 ### Auto-export config
 Add, modify, & toggle auto-exports. You can choose exactly where they should export to. All enabled auto-exports will be exported to it's set location the next time you run the project in the editor.
 
-## #API version
+### API version
 This integer determines the version of your game's API (or API version for a specific mod type if set within a mod type group), this should be updated to a higher value every time you publish your game with compatiility-breaking mod API changes.
 
 ### Load from path
