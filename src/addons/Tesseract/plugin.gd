@@ -69,6 +69,7 @@ func _build() -> bool:
 		print('Exporting mod "%s" to "%s".' % [mod_path,output_path])
 		# Export package if output path has valid extension.
 		if output_path.to_lower().get_extension() in ['tmod','zip']:
+			DirAccess.make_dir_recursive_absolute(output_path.get_base_dir())
 			filesystem_context_menu_instance._save_tmod(true, [output_path], 0, mod_path)
 		# Export as folder if output path is not a valid file.
 		else:
