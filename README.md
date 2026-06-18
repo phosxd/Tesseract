@@ -55,8 +55,8 @@ Useful for quickly sharing your packaged mod.
 File system context menu option that opens a dialog that lets you input basic information to automatically create a new mod directory with all required files added.
 This way, you won't need to constantly refer to the documentation to create a new mod.
 
-### Auto-exporting
-The very last tab in project settings should be a tab called "Tesseract Settings", in that tab you can add & manage a list of mods that will automatically be re-exported to the given location (as TMOD, ZIP or folder) before running the project. This is very useful for quick prototyping & brings mods one step closer to being just as good as native resources in the editor.
+### GUI settings menu
+The very last tab in project settings should be a tab called "Tesseract Settings", in that tab you can edit & manage all of Tesseract's settings in a convenient way! Refer to [plugin settings](#plugin-settings) to see all the configurable options.
 
 ## Runtime unloading
 Tesseract allows you to unload individual mods to restore original resources in the virtual file system.
@@ -114,6 +114,8 @@ You can create new mod types & set individual rule overrides for that mod type. 
 
 ### Auto-export config
 Add, modify, & toggle auto-exports. You can choose exactly where they should export to. All enabled auto-exports will be exported to it's set location the next time you run the project in the editor.
+
+If the export location ends with `.zip` or `.tmod` it will be packaged into a single file instead of a folder.
 
 ### API version
 This integer determines the version of your game's API (or API version for a specific mod type if set within a mod type group), this should be updated to a higher value every time you publish your game with compatiility-breaking mod API changes.
