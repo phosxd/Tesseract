@@ -31,10 +31,10 @@ Tesseract is a mod loader for Godot 4.6 that gives both modders & game developer
 ## Load from ZIP or folder
 Tesseract can load mods from ZIP (or TMOD) files, as well as straight from a folder containing all the mod's content.
 
-Loading from folder is my favorite way for quick testing, you just drag the folder sraight from your Godot project then into the game's designated mods folder, no exporting, no packing, it's simple.
+Loading from folder is my favorite way for quick testing, you just drag the folder straight from your Godot project then into the game's designated mods folder, no exporting, no packing, it's simple.
 
 ### ZIP Pros:
-- Comressable size. Not very helpful for small mods though.
+- Compress-able size. Not very helpful for small mods though.
 - Easier to transfer & share as it is a singular file.
 ### ZIP Cons:
 - Harder to modify directly.
@@ -45,7 +45,7 @@ Unlike with PCKs, Tesseract mods don't have to bundle in every asset it uses fro
 Although if you'd like, you can still bundle game assets into your mod, but beware it will overwrite the base game's original file.
 
 ## Editor integration
-One of my goals for Tesseract is for development to be as frictionless as humanly possible. That's why Tesseract offers multiple in-editor tools that make it much easier to develop for than alternatives. 
+One of my goals for Tesseract is for development to be as friction-less as humanly possible. That's why Tesseract offers multiple in-editor tools that make it much easier to develop for than alternatives. 
 
 ### Context menu export
 File system context menu option that opens a file save dialog for packing & exporting the selected mod as a TMOD ZIP file.
@@ -60,7 +60,7 @@ The very last tab in project settings should be a tab called "Tesseract Settings
 
 ## Runtime unloading
 Tesseract allows you to unload individual mods to restore original resources in the virtual file system.
-However, unloading has a few edge cases where the resources continue to be referenced well after unloading due to how the merging system works. To enure everything works smoothly it is recommended to unload ALL mods then reload the mods you want to keep loaded, although if you aren't experiencing issues it is fine to unload individual mods without reloading all the other mods.
+However, unloading has a few edge cases where the resources continue to be referenced well after unloading due to how the merging system works. To ensure everything works smoothly it is recommended to unload ALL mods then reload the mods you want to keep loaded, although if you aren't experiencing issues it is fine to unload individual mods without reloading all the other mods.
 
 ## Browse mod files & directories
 Godot PCKs just merge into the virtual file system with no easy way to get the specific files or directories added or changed.
@@ -70,7 +70,7 @@ To address this, Tesseract implements convenient methods for getting all directo
 Game developers can specify "mod types" each with their own set of permissions, any mod that specifies a mod type will inherit it's permissions.
 They can also choose where in the virtual file system mod files are loaded into, regulate / block script usage, & choose which files mods are allowed to overwrite.
 
-By "regulate script usage" I mean you can either outright block all use of built-in & external scripts, or you can add blocked keywords which while not a full solution does help deter mallicious actors.
+By "regulate script usage" I mean you can either outright block all use of built-in & external scripts, or you can add blocked keywords which while not a full solution does help deter malicious actors.
 
 ## Detailed metadata
 Tesseract mods use `.cfg` files as their manifest, making it easy to integrate & read from within your game. Mods are also loaded as a unique `TesseractMod` object that holds all the metadata, & also can be interacted with if the mod has an entry point script.
@@ -103,7 +103,7 @@ This might be implemented sooner or later, it all depends on the demand from mys
 
 
 # Plugin settings
-You technically do not need to change the plugin's configurtion for it to work as expected, but it is definitely worth taking a look for features you might find useful.
+You technically do not need to change the plugin's configuration for it to work as expected, but it is definitely worth taking a look for features you might find useful.
 
 There are 2 ways you can edit the configuration, the first (& recommended) way to do this is through the "Tesseract Settings" tab in project settings. It is the most convenient & you don't have to worry about messing up the file's config format.
 The second way is to directly modify the `res://addons/Tesseract/plugin.cfg` file, though you must be careful not to break anything.
@@ -160,7 +160,7 @@ Workarounds:
 To prevent these workarounds, use this list: `["ClassDB.", "Engine.", "GDScript."]`
 
 There are very well more workarounds that have not been or can not be accounted for.
-But this should be enough to deter most people from writing mallicious code.
+But this should be enough to deter most people from writing malicious code.
 
 ### (For mod types) priority
 Load order priority, lower valued mod types will load their mods before higher valued mod types.
